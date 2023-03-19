@@ -3,7 +3,7 @@ package model
 import "github.com/google/uuid"
 
 type Vehicle struct {
-	Id             uuid.UUID
+	Id             string
 	Brand          string
 	Model          string
 	ProductionYear int
@@ -19,5 +19,5 @@ func (v *Vehicle) IsValidStatus() bool {
 }
 
 func (v *Vehicle) SetId() {
-	v.Id = uuid.New()
+	v.Id = uuid.New().String()
 }

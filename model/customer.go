@@ -7,7 +7,7 @@ import (
 )
 
 type Customer struct {
-	Id          uuid.UUID
+	Id          string
 	FirstName   string
 	LastName    string
 	Address     string
@@ -17,5 +17,5 @@ type Customer struct {
 }
 
 func (c *Customer) SetId() {
-	c.Id = uuid.New()
+	c.Id = uuid.New().String()
 }

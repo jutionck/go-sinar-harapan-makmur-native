@@ -7,7 +7,7 @@ import (
 )
 
 type Transaction struct {
-	Id              uuid.UUID
+	Id              string
 	TransactionDate time.Time
 	Vehicle
 	Customer
@@ -21,5 +21,5 @@ func (t *Transaction) IsValidType() bool {
 }
 
 func (t *Transaction) SetId() {
-	t.Id = uuid.New()
+	t.Id = uuid.New().String()
 }

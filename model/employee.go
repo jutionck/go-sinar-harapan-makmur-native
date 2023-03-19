@@ -7,7 +7,7 @@ import (
 )
 
 type Employee struct {
-	Id          uuid.UUID
+	Id          string
 	FirstName   string
 	LastName    string
 	Address     string
@@ -20,5 +20,5 @@ type Employee struct {
 }
 
 func (e *Employee) SetId() {
-	e.Id = uuid.New()
+	e.Id = uuid.New().String()
 }
