@@ -8,6 +8,8 @@ import (
 
 type EmployeeRepository interface {
 	BaseRepository[model.Employee]
+	GetByEmail(email string) (model.Employee, error)
+	GetByPhoneNumber(phoneNumber string) (model.Employee, error)
 }
 
 type employeeRepository struct {
@@ -58,24 +60,54 @@ func (e *employeeRepository) Delete(id string) error {
 	return fmt.Errorf("Data tidak ditemukan")
 }
 
+func (c *employeeRepository) GetByEmail(email string) (model.Employee, error) {
+	for _, customer := range c.db {
+		if customer.Email == email {
+			return customer, nil
+		}
+	}
+	return model.Employee{}, fmt.Errorf("Employee with email: %s don't exists", email)
+}
+
+func (c *employeeRepository) GetByPhoneNumber(phoneNumber string) (model.Employee, error) {
+	for _, customer := range c.db {
+		if customer.PhoneNumber == phoneNumber {
+			return customer, nil
+		}
+	}
+	return model.Employee{}, fmt.Errorf("Employee with phone number: %s don't exists", phoneNumber)
+}
+
 func NewEmployeeRepository() EmployeeRepository {
 	employees := []model.Employee{
 		{
-			Id:        "EP001",
-			FirstName: "Edo",
-			LastName:  "Sensei",
+			Id:          "EP001",
+			FirstName:   "Edo",
+			LastName:    "Sensei",
+			Email:       "edo.sensei@gmail.com",
+			PhoneNumber: "0878282829",
+			Posisition:  "Manager",
+			Salary:      25000000,
 		},
 		{
-			Id:        "EP002",
-			FirstName: "Angga",
-			LastName:  "Raditya",
-			Manager:   &model.Employee{Id: "EP001"},
+			Id:          "EP002",
+			FirstName:   "Angga",
+			LastName:    "Raditya",
+			Email:       "angga.raditya@gmail.com",
+			PhoneNumber: "0857282829",
+			Posisition:  "Staff A",
+			Salary:      85000000,
+			Manager:     &model.Employee{Id: "EP001"},
 		},
 		{
-			Id:        "EP003",
-			FirstName: "Joe",
-			LastName:  "Andrey",
-			Manager:   &model.Employee{Id: "EP001"},
+			Id:          "EP003",
+			FirstName:   "Joe",
+			LastName:    "Andrey",
+			Email:       "joe.andrey@gmail.com",
+			PhoneNumber: "0812282829",
+			Posisition:  "Staff B",
+			Salary:      7500000,
+			Manager:     &model.Employee{Id: "EP001"},
 		},
 	}
 	return &employeeRepository{db: employees}

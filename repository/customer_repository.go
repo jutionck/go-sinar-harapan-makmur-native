@@ -8,6 +8,8 @@ import (
 
 type CustomerRepository interface {
 	BaseRepository[model.Customer]
+	GetByEmail(email string) (model.Customer, error)
+	GetByPhoneNumber(phoneNumber string) (model.Customer, error)
 }
 
 type customerRepository struct {
@@ -58,22 +60,46 @@ func (c *customerRepository) Delete(id string) error {
 	return fmt.Errorf("Data tidak ditemukan")
 }
 
+func (c *customerRepository) GetByEmail(email string) (model.Customer, error) {
+	for _, customer := range c.db {
+		if customer.Email == email {
+			return customer, nil
+		}
+	}
+	return model.Customer{}, fmt.Errorf("Customer with email: %s don't exists", email)
+}
+
+func (c *customerRepository) GetByPhoneNumber(phoneNumber string) (model.Customer, error) {
+	for _, customer := range c.db {
+		if customer.PhoneNumber == phoneNumber {
+			return customer, nil
+		}
+	}
+	return model.Customer{}, fmt.Errorf("Customer with phone number: %s don't exists", phoneNumber)
+}
+
 func NewCustomerRepository() CustomerRepository {
 	customers := []model.Customer{
 		{
-			Id:        "C0001",
-			FirstName: "Jution",
-			LastName:  "Candra",
+			Id:          "C0001",
+			FirstName:   "Jution",
+			LastName:    "Candra",
+			Email:       "jution.candra@gmail.com",
+			PhoneNumber: "0821111111",
 		},
 		{
-			Id:        "C0002",
-			FirstName: "Fadli",
-			LastName:  "Rahman",
+			Id:          "C0002",
+			FirstName:   "Fadli",
+			LastName:    "Rahman",
+			Email:       "fadlo.rahman@gmail.com",
+			PhoneNumber: "0821222222",
 		},
 		{
-			Id:        "C0003",
-			FirstName: "Tika",
-			LastName:  "Yesi",
+			Id:          "C0003",
+			FirstName:   "Tika",
+			LastName:    "Yesi",
+			Email:       "tika.yesi@gmail.com",
+			PhoneNumber: "0821333333",
 		},
 	}
 	return &customerRepository{db: customers}

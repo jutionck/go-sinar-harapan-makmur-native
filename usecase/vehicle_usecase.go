@@ -48,12 +48,15 @@ func (v *vehicleUseCase) RegisterNewVehicle(newVehicle model.Vehicle) error {
 
 	return nil
 }
+
 func (v *vehicleUseCase) FindAllVehicle() ([]model.Vehicle, error) {
 	return v.vehicleRepo.List()
 }
+
 func (v *vehicleUseCase) GetVehicle(id string) (model.Vehicle, error) {
 	return v.vehicleRepo.Get(id)
 }
+
 func (v *vehicleUseCase) UpdateVehicle(newVehicle model.Vehicle) error {
 	if newVehicle.Brand == "" || newVehicle.Model == "" || newVehicle.Color == "" {
 		return fmt.Errorf("Brand, Model, and Color are required fields")
@@ -78,6 +81,7 @@ func (v *vehicleUseCase) UpdateVehicle(newVehicle model.Vehicle) error {
 
 	return nil
 }
+
 func (v *vehicleUseCase) DeleteVehicle(id string) error {
 	return v.vehicleRepo.Delete(id)
 }
