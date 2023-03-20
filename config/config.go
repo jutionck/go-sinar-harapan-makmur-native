@@ -1,47 +1,44 @@
 package config
 
 import (
-	"database/sql"
-	"fmt"
 	"log"
 	"os"
 
 	"github.com/joho/godotenv"
-	_ "github.com/lib/pq"
 )
 
-type Config struct {
-	Db *sql.DB
+type DbConfig struct {
+	Host     string
+	Port     string
+	Name     string
+	User     string
+	Password string
+	Driver   string
 }
 
-func (c *Config) initDb() {
+type Config struct {
+	DbConfig
+}
+
+func (c Config) readConfigFile() Config {
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}
 
-	host := os.Getenv("DB_HOST")
-	port := os.Getenv("DB_PORT")
-	user := os.Getenv("DB_USER")
-	password := os.Getenv("DB_PASSWORD")
-	dbName := os.Getenv("DB_NAME")
-	dbDriver := os.Getenv("DB_DRIVER")
-
-	// dsn := fmt.Sprintf("%s://%s:%s@%s:%s/%s?sslmode=disable", dbDriver, user, password, host, port, dbName)
-	psqlInfo := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, dbName)
-	db, err := sql.Open(dbDriver, psqlInfo)
-	if err != nil {
-		panic(err)
+	c.DbConfig = DbConfig{
+		Host:     os.Getenv("DB_HOST"),
+		Port:     os.Getenv("DB_PORT"),
+		Name:     os.Getenv("DB_NAME"),
+		User:     os.Getenv("DB_USER"),
+		Password: os.Getenv("DB_PASSWORD"),
+		Driver:   os.Getenv("DB_DRIVER"),
 	}
-	c.Db = db
-}
 
-func (c *Config) DbConn() *sql.DB {
-	return c.Db
+	return c
 }
 
 func NewConfig() Config {
 	cfg := Config{}
-	cfg.initDb()
-	return cfg
+	return cfg.readConfigFile()
 }

@@ -9,10 +9,12 @@ import (
 
 func main() {
 
-	cfg := config.NewConfig()
-	defer cfg.DbConn().Close()
+	c := config.NewConfig()
+	dbConn := config.NewDbConnection(c)
 
-	err := cfg.DbConn().Ping()
+	defer dbConn.Conn().Close()
+
+	err := dbConn.Conn().Ping()
 	if err != nil {
 		panic(err)
 	}
