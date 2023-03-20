@@ -3,49 +3,45 @@ package config
 import (
 	"database/sql"
 	"fmt"
-	"log"
 
 	_ "github.com/lib/pq"
 )
 
-type DbConection interface {
+type DbConnection interface {
 	Conn() *sql.DB
 }
 
 type dbConnection struct {
 	db  *sql.DB
-	cfg Config
+	cfg *Config
 }
 
-func (d *dbConnection) initDb() {
+func (d *dbConnection) initDb() error {
 	psqlconn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", d.cfg.Host, d.cfg.Port, d.cfg.User, d.cfg.Password, d.cfg.Name)
 	db, err := sql.Open(d.cfg.Driver, psqlconn)
 	if err != nil {
-		panic(err)
+		return err
 	}
-	defer func() {
-		if err := recover(); err != nil {
-			log.Println("Application Failed to run", err)
-		}
-	}()
 
-	err = db.Ping()
-
-	if err != nil {
-		panic(err)
+	if err := db.Ping(); err != nil {
+		return err
 	}
+
 	d.db = db
-	log.Println("Database connected")
+	return nil
 }
 
 func (d *dbConnection) Conn() *sql.DB {
 	return d.db
 }
 
-func NewDbConnection(config Config) DbConection {
-	infra := dbConnection{
-		cfg: config,
+func NewDbConnection(cfg *Config) (DbConnection, error) {
+	conn := &dbConnection{
+		cfg: cfg,
 	}
-	infra.initDb()
-	return &infra
+	err := conn.initDb()
+	if err != nil {
+		return nil, err
+	}
+	return conn, nil
 }

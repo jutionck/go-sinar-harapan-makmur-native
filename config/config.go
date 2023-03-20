@@ -1,7 +1,7 @@
 package config
 
 import (
-	"log"
+	"errors"
 	"os"
 
 	"github.com/joho/godotenv"
@@ -20,10 +20,10 @@ type Config struct {
 	DbConfig
 }
 
-func (c Config) readConfigFile() Config {
-	err := godotenv.Load()
+func (c *Config) ReadConfigFile() error {
+	err := godotenv.Load(".env")
 	if err != nil {
-		log.Fatal("Error loading .env file")
+		return errors.New("failed to load .env file")
 	}
 
 	c.DbConfig = DbConfig{
@@ -35,10 +35,19 @@ func (c Config) readConfigFile() Config {
 		Driver:   os.Getenv("DB_DRIVER"),
 	}
 
-	return c
+	if c.DbConfig.Host == "" || c.DbConfig.Port == "" || c.DbConfig.Name == "" ||
+		c.DbConfig.User == "" || c.DbConfig.Password == "" || c.DbConfig.Driver == "" {
+		return errors.New("missing required environment variables")
+	}
+
+	return nil
 }
 
-func NewConfig() Config {
-	cfg := Config{}
-	return cfg.readConfigFile()
+func NewConfig() (*Config, error) {
+	cfg := &Config{}
+	err := cfg.ReadConfigFile()
+	if err != nil {
+		return nil, err
+	}
+	return cfg, nil
 }

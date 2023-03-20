@@ -9,15 +9,14 @@ import (
 
 func main() {
 
-	c := config.NewConfig()
-	dbConn := config.NewDbConnection(c)
+	c, err := config.NewConfig()
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	dbConn, _ := config.NewDbConnection(c)
 
 	defer dbConn.Conn().Close()
-
-	err := dbConn.Conn().Ping()
-	if err != nil {
-		panic(err)
-	}
 
 	figure := figure.NewFigure("Enigma Camp", "standard", true)
 	figure.Print()
