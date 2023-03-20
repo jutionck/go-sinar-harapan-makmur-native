@@ -3,7 +3,10 @@ package config
 import (
 	"database/sql"
 	"fmt"
+	"log"
+	"os"
 
+	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 )
 
@@ -12,12 +15,17 @@ type Config struct {
 }
 
 func (c *Config) initDb() {
-	host := "localhost"
-	port := "5432"
-	user := "postgres"
-	password := "P@ssw0rd"
-	dbName := "db_sinar_harapan_makmur"
-	dbDriver := "postgres"
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+
+	host := os.Getenv("DB_HOST")
+	port := os.Getenv("DB_PORT")
+	user := os.Getenv("DB_USER")
+	password := os.Getenv("DB_PASSWORD")
+	dbName := os.Getenv("DB_NAME")
+	dbDriver := os.Getenv("DB_DRIVER")
 
 	// dsn := fmt.Sprintf("%s://%s:%s@%s:%s/%s?sslmode=disable", dbDriver, user, password, host, port, dbName)
 	psqlInfo := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, dbName)
