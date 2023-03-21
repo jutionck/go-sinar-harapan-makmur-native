@@ -1,7 +1,7 @@
 package repository
 
 import (
-	"fmt"
+	"database/sql"
 
 	"github.com/jutionck/golang-db-sinar-harapan-makmur/model"
 )
@@ -11,111 +11,68 @@ type VehicleRepository interface {
 }
 
 type vehicleRepository struct {
-	db []model.Vehicle
+	db *sql.DB
 }
 
 func (v *vehicleRepository) Create(newData model.Vehicle) error {
-	v.db = append(v.db, newData)
-	if len(v.db) == 0 {
-		return fmt.Errorf("Gagal menyimpan data")
+	sql := "INSERT INTO vehicle (id, brand, model, production_year, color, is_automatic, sale_price, stock, status) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)"
+	_, err := v.db.Exec(sql, newData.Id, newData.Brand, newData.Model, newData.ProductionYear, newData.Color, newData.IsAutomatic, newData.SalePrice, newData.Stock, newData.Status)
+	if err != nil {
+		return err
 	}
+
 	return nil
 }
 
 func (v *vehicleRepository) List() ([]model.Vehicle, error) {
-	if len(v.db) == 0 {
-		return nil, fmt.Errorf("Database kosong")
+	sql := `SELECT id, brand, model, production_year, color, is_automatic, sale_price, stock, status FROM vehicle`
+	rows, err := v.db.Query(sql)
+	if err != nil {
+		return nil, err
 	}
-	return v.db, nil
+
+	var vehicle []model.Vehicle
+	for rows.Next() {
+		var vehilce model.Vehicle
+		err := rows.Scan(&vehilce.Id, &vehilce.Brand, &vehilce.Model, &vehilce.ProductionYear, &vehilce.Color, &vehilce.IsAutomatic, &vehilce.SalePrice, &vehilce.Stock, &vehilce.Status)
+		if err != nil {
+			return nil, err
+		}
+		vehicle = append(vehicle, vehilce)
+	}
+	return vehicle, nil
 }
 
 func (v *vehicleRepository) Get(id string) (model.Vehicle, error) {
-	for _, vehicle := range v.db {
-		if vehicle.Id == id {
-			return vehicle, nil
-		}
+	sql := `SELECT id, brand, model, production_year, color, is_automatic, sale_price, stock, status FROM vehicle WHERE id = $1`
+	var vehilce model.Vehicle
+	err := v.db.QueryRow(sql, id).Scan(&vehilce.Id, &vehilce.Brand, &vehilce.Model, &vehilce.ProductionYear, &vehilce.Color, &vehilce.IsAutomatic, &vehilce.SalePrice, &vehilce.Stock, &vehilce.Status)
+	if err != nil {
+		return model.Vehicle{}, err
 	}
-	return model.Vehicle{}, fmt.Errorf("Data tidak ditemukan")
+	return vehilce, nil
 }
 
 func (v *vehicleRepository) Update(newData model.Vehicle) error {
-	for i, vehicle := range v.db {
-		if vehicle.Id == newData.Id {
-			v.db[i] = newData
-			return nil
-		}
+	sql := "UPDATE vehicle set brand = $1, model = $2, production_year = $3, color = $4, is_automatic = $5, sale_price = $6, stock = $7, status = $8 WHERE id = $9"
+	_, err := v.db.Exec(sql, &newData.Brand, &newData.Model, &newData.ProductionYear, &newData.Color, &newData.IsAutomatic, &newData.SalePrice, &newData.Stock, &newData.Status, newData.Id)
+	if err != nil {
+		return err
 	}
-	return fmt.Errorf("Data tidak ditemukan")
+
+	return nil
 }
 
 func (v *vehicleRepository) Delete(id string) error {
-	for i, vehicle := range v.db {
-		if vehicle.Id == id {
-			v.db = append(v.db[:i], v.db[i+1:]...)
-			return nil
-		}
+	sql := "DELETE FROM vehicle WHERE id = $1"
+	_, err := v.db.Exec(sql, id)
+	if err != nil {
+		return err
 	}
-	return fmt.Errorf("Data tidak ditemukan")
+
+	return nil
 }
 
-func NewVehicleRepository() VehicleRepository {
-	vehicles := []model.Vehicle{
-		{
-			Id:             "V0001",
-			Brand:          "Honda",
-			Model:          "HR-V",
-			ProductionYear: 2022,
-			Color:          "Putih",
-			SalePrice:      301000000,
-			IsAutomatic:    true,
-			Stock:          10,
-			Status:         "Baru",
-		},
-		{
-			Id:             "V0002",
-			Brand:          "Honda",
-			Model:          "Civic",
-			ProductionYear: 2021,
-			Color:          "Putih",
-			SalePrice:      301000000,
-			IsAutomatic:    true,
-			Stock:          7,
-			Status:         "Bekas",
-		},
-		{
-			Id:             "V0003",
-			Brand:          "Mitshubishi",
-			Model:          "XPander",
-			ProductionYear: 2022,
-			Color:          "Hitam",
-			SalePrice:      231750000,
-			IsAutomatic:    false,
-			Stock:          5,
-			Status:         "Baru",
-		},
-		{
-			Id:             "V0004",
-			Brand:          "Toyota",
-			Model:          "Rush",
-			ProductionYear: 2021,
-			Color:          "Hitam",
-			SalePrice:      232000000,
-			IsAutomatic:    true,
-			Stock:          5,
-			Status:         "Baru",
-		},
-		{
-			Id:             "V0005",
-			Brand:          "Mazda",
-			Model:          "CX-3",
-			ProductionYear: 2022,
-			Color:          "Putih",
-			SalePrice:      302000000,
-			IsAutomatic:    true,
-			Stock:          15,
-			Status:         "Baru",
-		},
-	}
-
-	return &vehicleRepository{db: vehicles}
+func NewVehicleRepository(db *sql.DB) VehicleRepository {
+	return &vehicleRepository{db: db}
 }
