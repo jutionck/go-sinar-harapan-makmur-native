@@ -20,25 +20,9 @@ type vehicleUseCase struct {
 }
 
 func (v *vehicleUseCase) RegisterNewVehicle(newVehicle model.Vehicle) error {
-	isExists, _ := v.GetVehicle(newVehicle.Id)
-	if isExists.Id == newVehicle.Id {
-		return fmt.Errorf("Vehicle with ID: %v exists", newVehicle.Id)
-	}
 
-	if newVehicle.Brand == "" || newVehicle.Model == "" || newVehicle.Color == "" {
-		return fmt.Errorf("Brand, Model, and Color are required fields")
-	}
-
-	if !newVehicle.IsValidStatus() {
-		return fmt.Errorf("Invalid status: %s", newVehicle.Status)
-	}
-
-	if newVehicle.SalePrice < 0 || newVehicle.SalePrice == 0 {
-		return fmt.Errorf("Sale price can't zero or negative ")
-	}
-
-	if newVehicle.Stock < 0 {
-		return fmt.Errorf("Stock can't negative ")
+	if err := vehicleValidation(newVehicle); err != nil {
+		return err
 	}
 
 	err := v.vehicleRepo.Create(newVehicle)
@@ -58,20 +42,8 @@ func (v *vehicleUseCase) GetVehicle(id string) (model.Vehicle, error) {
 }
 
 func (v *vehicleUseCase) UpdateVehicle(newVehicle model.Vehicle) error {
-	if newVehicle.Brand == "" || newVehicle.Model == "" || newVehicle.Color == "" {
-		return fmt.Errorf("Brand, Model, and Color are required fields")
-	}
-
-	if !newVehicle.IsValidStatus() {
-		return fmt.Errorf("Invalid status: %s", newVehicle.Status)
-	}
-
-	if newVehicle.SalePrice < 0 || newVehicle.SalePrice == 0 {
-		return fmt.Errorf("Sale price can't zero or negative ")
-	}
-
-	if newVehicle.Stock < 0 {
-		return fmt.Errorf("Stock can't negative ")
+	if err := vehicleValidation(newVehicle); err != nil {
+		return err
 	}
 
 	err := v.vehicleRepo.Update(newVehicle)
@@ -84,6 +56,25 @@ func (v *vehicleUseCase) UpdateVehicle(newVehicle model.Vehicle) error {
 
 func (v *vehicleUseCase) DeleteVehicle(id string) error {
 	return v.vehicleRepo.Delete(id)
+}
+
+func vehicleValidation(payload model.Vehicle) error {
+	if payload.Brand == "" || payload.Model == "" || payload.Color == "" {
+		return fmt.Errorf("Brand, Model, and Color are required fields")
+	}
+
+	if !payload.IsValidStatus() {
+		return fmt.Errorf("Invalid status: %s", payload.Status)
+	}
+
+	if payload.SalePrice < 0 || payload.SalePrice == 0 {
+		return fmt.Errorf("Sale price can't zero or negative ")
+	}
+
+	if payload.Stock < 0 {
+		return fmt.Errorf("Stock can't negative ")
+	}
+	return nil
 }
 
 func NewVehicleUseCase(vehicleRepo repository.VehicleRepository) VehicleUseCase {
