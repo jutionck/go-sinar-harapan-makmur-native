@@ -6,6 +6,7 @@ import (
 
 	"github.com/jutionck/golang-db-sinar-harapan-makmur/config"
 	"github.com/jutionck/golang-db-sinar-harapan-makmur/model"
+	"github.com/jutionck/golang-db-sinar-harapan-makmur/model/dto"
 	"github.com/jutionck/golang-db-sinar-harapan-makmur/repository"
 	"github.com/jutionck/golang-db-sinar-harapan-makmur/usecase"
 )
@@ -23,22 +24,48 @@ func VehicleCLI() {
 	vehicleUseCase := usecase.NewVehicleUseCase(vehicleRepository)
 
 	// cretae
-	newVehicle := model.Vehicle{
-		Brand:     "Toyota",
-		Model:     "Alphard",
-		Color:     "Putih",
-		Stock:     0,
-		Status:    "Baru",
-		SalePrice: 900000000,
-	}
-	newVehicle.SetId()
-	if err := vehicleUseCase.RegisterNewVehicle(newVehicle); err != nil {
-		fmt.Println(err)
-		return
-	}
+	// newVehicle := model.Vehicle{
+	// 	Brand:     "Toyota",
+	// 	Model:     "Alphard",
+	// 	Color:     "Putih",
+	// 	Stock:     0,
+	// 	Status:    "Baru",
+	// 	SalePrice: 900000000,
+	// }
+	// newVehicle.SetId()
+	// if err := vehicleUseCase.RegisterNewVehicle(newVehicle); err != nil {
+	// 	fmt.Println(err)
+	// 	return
+	// }
 
-	// Get All
-	vehicles, err := vehicleUseCase.FindAllVehicle()
+	// // Get All
+	// vehicles, err := vehicleUseCase.FindAllVehicle()
+	// if err != nil {
+	// 	fmt.Println(err)
+	// } else {
+	// 	for _, v := range vehicles {
+	// 		fmt.Println("ID:", v.Id)
+	// 		fmt.Println("Brand:", v.Brand)
+	// 		fmt.Println("Model:", v.Model)
+	// 		fmt.Println("Production Year:", v.ProductionYear)
+	// 		fmt.Println("Color:", v.Color)
+	// 		fmt.Println("Price:", v.SalePrice)
+	// 		fmt.Println("Is Automatic:", v.IsAutomatic)
+	// 		fmt.Println("Stock:", v.Stock)
+	// 		fmt.Println("Status:", v.Status)
+	// 		fmt.Println()
+	// 	}
+	// }
+
+	// Paging
+	requestQueryParams := dto.RequestQueryParams{
+		// PaginationParam: dto.PaginationParam{
+		// 	Page:   4,
+		// 	Offset: 0,
+		// 	Limit:  5,
+		// },
+	}
+	vehicles, paging := vehicleUseCase.Paging(requestQueryParams)
 	if err != nil {
 		fmt.Println(err)
 	} else {
@@ -54,6 +81,11 @@ func VehicleCLI() {
 			fmt.Println("Status:", v.Status)
 			fmt.Println()
 		}
+		fmt.Println("Paging:")
+		fmt.Println("page:", paging.Page)
+		fmt.Println("totalPages:", paging.TotalPages)
+		fmt.Println("totalRows:", paging.TotalRows)
+		fmt.Println("rowsPerPage:", paging.RowsPerPage)
 	}
 }
 

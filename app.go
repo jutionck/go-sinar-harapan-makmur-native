@@ -9,9 +9,9 @@ func main() {
 	figure := figure.NewFigure("Enigma Camp", "standard", true)
 	figure.Print()
 
-	// delivery.VehicleCLI()
+	delivery.VehicleCLI()
 	// delivery.CustomerCLI()
 	// delivery.EmployeeCLI()
-	delivery.TransactionCLI()
+	// delivery.TransactionCLI()
 
 }

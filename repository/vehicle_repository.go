@@ -4,10 +4,13 @@ import (
 	"database/sql"
 
 	"github.com/jutionck/golang-db-sinar-harapan-makmur/model"
+	"github.com/jutionck/golang-db-sinar-harapan-makmur/model/dto"
+	"github.com/jutionck/golang-db-sinar-harapan-makmur/utils/common"
 )
 
 type VehicleRepository interface {
 	BaseRepository[model.Vehicle]
+	BaseRepositoryPaging[model.Vehicle]
 }
 
 type vehicleRepository struct {
@@ -71,6 +74,44 @@ func (v *vehicleRepository) Delete(id string) error {
 	}
 
 	return nil
+}
+
+func (v *vehicleRepository) Paging(requestQueryParams dto.RequestQueryParams) ([]model.Vehicle, dto.Paging) {
+	var paginationQuery dto.PaginationQuery
+	paginationQuery = common.GetPaginationParams(requestQueryParams.PaginationParam)
+	sql := `SELECT id, brand, model, production_year, color, is_automatic, sale_price, stock, status FROM vehicle LIMIT $1 OFFSET $2`
+	rows, err := v.db.Query(sql, paginationQuery.Take, paginationQuery.Skip)
+	if err != nil {
+		return nil, dto.Paging{}
+	}
+
+	var vehicle []model.Vehicle
+	for rows.Next() {
+		var vehilce model.Vehicle
+		err := rows.Scan(&vehilce.Id, &vehilce.Brand, &vehilce.Model, &vehilce.ProductionYear, &vehilce.Color, &vehilce.IsAutomatic, &vehilce.SalePrice, &vehilce.Stock, &vehilce.Status)
+		if err != nil {
+			return nil, dto.Paging{}
+		}
+		vehicle = append(vehicle, vehilce)
+	}
+	totalRows, err := v.getTotalRows()
+	if err != nil {
+		return nil, dto.Paging{}
+	}
+	return vehicle, common.Paginate(paginationQuery.Page, paginationQuery.Take, totalRows)
+}
+
+func (v *vehicleRepository) getTotalRows() (int, error) {
+	sql := `SELECT COUNT(*) FROM vehicle`
+	row := v.db.QueryRow(sql)
+
+	var count int
+	err := row.Scan(&count)
+	if err != nil {
+		return 0, err
+	}
+
+	return count, nil
 }
 
 func NewVehicleRepository(db *sql.DB) VehicleRepository {

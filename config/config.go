@@ -4,7 +4,7 @@ import (
 	"errors"
 	"os"
 
-	"github.com/joho/godotenv"
+	"github.com/jutionck/golang-db-sinar-harapan-makmur/utils/common"
 )
 
 type DbConfig struct {
@@ -21,9 +21,9 @@ type Config struct {
 }
 
 func (c *Config) ReadConfigFile() error {
-	err := godotenv.Load(".env")
+	err := common.LoadFileEnv(".env")
 	if err != nil {
-		return errors.New("failed to load .env file")
+		return err
 	}
 
 	c.DbConfig = DbConfig{

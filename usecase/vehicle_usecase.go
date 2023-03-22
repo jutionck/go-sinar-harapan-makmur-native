@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/jutionck/golang-db-sinar-harapan-makmur/model"
+	"github.com/jutionck/golang-db-sinar-harapan-makmur/model/dto"
 	"github.com/jutionck/golang-db-sinar-harapan-makmur/repository"
 )
 
@@ -13,6 +14,7 @@ type VehicleUseCase interface {
 	GetVehicle(id string) (model.Vehicle, error)
 	UpdateVehicle(newVehicle model.Vehicle) error
 	DeleteVehicle(id string) error
+	Paging(requestQueryParams dto.RequestQueryParams) ([]model.Vehicle, dto.Paging)
 }
 
 type vehicleUseCase struct {
@@ -56,6 +58,10 @@ func (v *vehicleUseCase) UpdateVehicle(newVehicle model.Vehicle) error {
 
 func (v *vehicleUseCase) DeleteVehicle(id string) error {
 	return v.vehicleRepo.Delete(id)
+}
+
+func (v *vehicleUseCase) Paging(requestQueryParams dto.RequestQueryParams) ([]model.Vehicle, dto.Paging) {
+	return v.vehicleRepo.Paging(requestQueryParams)
 }
 
 func vehicleValidation(payload model.Vehicle) error {
