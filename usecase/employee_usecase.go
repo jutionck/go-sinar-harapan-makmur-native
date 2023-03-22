@@ -84,16 +84,17 @@ func (e *employeeUseCase) UpdateEmployee(newEmployee model.Employee) error {
 		return fmt.Errorf("FirstName, LastName, PhoneNumber and Email are required fields")
 	}
 
-	manager, err := e.FindManagerById(newEmployee.Manager.Id)
-	if err != nil {
-		return fmt.Errorf("Manager with ID: %v exists", newEmployee.Manager.Id)
-	}
-
-	if newEmployee.Manager.Id != "" {
+	if newEmployee.Manager != nil {
+		manager, err := e.FindManagerById(newEmployee.Manager.Id)
+		if err != nil {
+			return fmt.Errorf("Manager with ID: %v exists", newEmployee.Manager.Id)
+		}
 		newEmployee.Manager = &manager
+	} else {
+		newEmployee.Manager = nil
 	}
 
-	err = e.employeeRepo.Update(newEmployee)
+	err := e.employeeRepo.Update(newEmployee)
 	if err != nil {
 		return fmt.Errorf("Failed to udpate vehicle: %v", err)
 	}

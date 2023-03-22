@@ -51,7 +51,13 @@ func (e *employeeRepository) Get(id string) (model.Employee, error) {
 
 func (e *employeeRepository) Update(newData model.Employee) error {
 	sql := "UPDATE employee SET first_name = $1, last_name = $2, address = $3, phone_number = $4, email = $5, bod = $6, position = $7, salary = $8, manager_id = $9 WHERE id = $10"
-	_, err := e.db.Exec(sql, newData.FirstName, newData.LastName, newData.Address, newData.PhoneNumber, newData.Email, newData.Bod, newData.Posisition, newData.Salary, newData.Manager.Id, newData.Id)
+	var managerID interface{}
+	if newData.Manager != nil {
+		managerID = newData.Manager.Id
+	} else {
+		managerID = nil
+	}
+	_, err := e.db.Exec(sql, newData.FirstName, newData.LastName, newData.Address, newData.PhoneNumber, newData.Email, newData.Bod, newData.Posisition, newData.Salary, managerID, newData.Id)
 	if err != nil {
 		return err
 	}
