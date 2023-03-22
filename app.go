@@ -11,6 +11,7 @@ func main() {
 
 	// delivery.VehicleCLI()
 	// delivery.CustomerCLI()
-	delivery.EmployeeCLI()
+	// delivery.EmployeeCLI()
+	delivery.TransactionCLI()
 
 }

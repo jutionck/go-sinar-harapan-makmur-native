@@ -28,7 +28,7 @@ func (t *transactionUsecase) RegisterNewTransaction(newData model.Transaction) e
 		return fmt.Errorf("Vehicle with ID: %s not exists", newData.Vehicle.Id)
 	}
 
-	// gte customer
+	// get customer
 	customer, err := t.customerUseCase.GetCustomer(newData.Customer.Id)
 	if err != nil {
 		return fmt.Errorf("Customer with ID: %s not exists", newData.Customer.Id)
@@ -45,6 +45,7 @@ func (t *transactionUsecase) RegisterNewTransaction(newData model.Transaction) e
 	newData.Employee = employee
 	td, _ := time.Parse("2006-01-02", time.Now().String())
 	newData.TransactionDate = td
+	newData.PaymentAmount = vehicle.SalePrice
 
 	return t.transactionRepo.Create(newData)
 }

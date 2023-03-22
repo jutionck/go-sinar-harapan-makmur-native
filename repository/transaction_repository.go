@@ -1,7 +1,7 @@
 package repository
 
 import (
-	"fmt"
+	"database/sql"
 
 	"github.com/jutionck/golang-db-sinar-harapan-makmur/model"
 )
@@ -13,32 +13,25 @@ type TransactionRepository interface {
 }
 
 type transactionRepository struct {
-	db []model.Transaction
+	db *sql.DB
 }
 
 func (t *transactionRepository) Create(newData model.Transaction) error {
-	t.db = append(t.db, newData)
-	if len(t.db) == 0 {
-		return fmt.Errorf("Gagal menyimpan data")
+	sql := "INSERT INTO transaction (id, transaction_date, vehicle_id, customer_id, employee_id, type, payment_amount) VALUES ($1,$2,$3,$4,$5,$6,$7)"
+	_, err := t.db.Exec(sql, newData.Id, newData.TransactionDate, newData.Vehicle.Id, newData.Customer.Id, newData.Employee.Id, newData.Type, newData.PaymentAmount)
+	if err != nil {
+		return err
 	}
 	return nil
 }
 
 func (t *transactionRepository) List() ([]model.Transaction, error) {
-	if len(t.db) == 0 {
-		return nil, fmt.Errorf("Database kosong")
-	}
-	return t.db, nil
+	return nil, nil
 }
 func (t *transactionRepository) Get(id string) (model.Transaction, error) {
-	for _, transaction := range t.db {
-		if transaction.Id == id {
-			return transaction, nil
-		}
-	}
-	return model.Transaction{}, fmt.Errorf("Data tidak ditemukan")
+	return model.Transaction{}, nil
 }
 
-func NewTransactionRepository() TransactionRepository {
-	return &transactionRepository{}
+func NewTransactionRepository(db *sql.DB) TransactionRepository {
+	return &transactionRepository{db: db}
 }
