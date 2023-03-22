@@ -2,6 +2,7 @@ package repository
 
 import (
 	"database/sql"
+	"fmt"
 
 	"github.com/jutionck/golang-db-sinar-harapan-makmur/model"
 	"github.com/jutionck/golang-db-sinar-harapan-makmur/model/dto"
@@ -79,7 +80,15 @@ func (v *vehicleRepository) Delete(id string) error {
 func (v *vehicleRepository) Paging(requestQueryParams dto.RequestQueryParams) ([]model.Vehicle, dto.Paging) {
 	var paginationQuery dto.PaginationQuery
 	paginationQuery = common.GetPaginationParams(requestQueryParams.PaginationParam)
-	sql := `SELECT id, brand, model, production_year, color, is_automatic, sale_price, stock, status FROM vehicle LIMIT $1 OFFSET $2`
+	orderQuery := "ORDER BY id"
+	if requestQueryParams.QueryParams.Order != "" && requestQueryParams.QueryParams.Sort != "" {
+		sorting := "ASC"
+		if requestQueryParams.QueryParams.Sort == "desc" {
+			sorting = "DESC"
+		}
+		orderQuery = fmt.Sprintf("ORDER BY %s %s", requestQueryParams.QueryParams.Order, sorting)
+	}
+	sql := fmt.Sprintf("SELECT id, brand, model, production_year, color, is_automatic, sale_price, stock, status FROM vehicle %s LIMIT $1 OFFSET $2", orderQuery)
 	rows, err := v.db.Query(sql, paginationQuery.Take, paginationQuery.Skip)
 	if err != nil {
 		return nil, dto.Paging{}

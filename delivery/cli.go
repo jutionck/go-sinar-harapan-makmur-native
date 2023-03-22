@@ -59,11 +59,15 @@ func VehicleCLI() {
 
 	// Paging
 	requestQueryParams := dto.RequestQueryParams{
-		// PaginationParam: dto.PaginationParam{
-		// 	Page:   4,
-		// 	Offset: 0,
-		// 	Limit:  5,
-		// },
+		QueryParams: dto.QueryParams{
+			Order: "model",
+			Sort:  "asc",
+		},
+		PaginationParam: dto.PaginationParam{
+			Page:   1,
+			Offset: 0,
+			Limit:  5,
+		},
 	}
 	vehicles, paging := vehicleUseCase.Paging(requestQueryParams)
 	if err != nil {
