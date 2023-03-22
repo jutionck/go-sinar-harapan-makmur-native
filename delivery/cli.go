@@ -2,6 +2,7 @@ package delivery
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/jutionck/golang-db-sinar-harapan-makmur/config"
 	"github.com/jutionck/golang-db-sinar-harapan-makmur/model"
@@ -16,6 +17,8 @@ func VehicleCLI() {
 		return
 	}
 	dbConn, _ := config.NewDbConnection(c)
+	defer dbConn.Conn().Close()
+
 	vehicleRepository := repository.NewVehicleRepository(dbConn.Conn())
 	vehicleUseCase := usecase.NewVehicleUseCase(vehicleRepository)
 
@@ -54,41 +57,48 @@ func VehicleCLI() {
 	}
 }
 
-// func CustomerCLI() {
-// 	customerRepository := repository.NewCustomerRepository()
-// 	customerUseCase := usecase.NewCustomerUseCase(customerRepository)
+func CustomerCLI() {
+	c, err := config.NewConfig()
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	dbConn, _ := config.NewDbConnection(c)
+	defer dbConn.Conn().Close()
 
-// 	// cretae
-// 	bod, _ := time.Parse("2006-01-02", "1999-11-11")
-// 	newCustomer := model.Customer{
-// 		Id:          "C0004",
-// 		FirstName:   "Tika",
-// 		LastName:    "Yesi",
-// 		PhoneNumber: "0821444444",
-// 		Email:       "tika.yesi@gmail.com",
-// 		Bod:         bod,
-// 	}
+	customerRepository := repository.NewCustomerRepository(dbConn.Conn())
+	customerUseCase := usecase.NewCustomerUseCase(customerRepository)
 
-// 	if err := customerUseCase.RegisterNewCustomer(newCustomer); err != nil {
-// 		fmt.Println(err)
-// 		return
-// 	}
+	// cretae
+	bod, _ := time.Parse("2006-01-02", "1999-11-11")
+	newCustomer := model.Customer{
+		FirstName:   "Tika",
+		LastName:    "Yesi",
+		PhoneNumber: "0821444444",
+		Email:       "tika.yesi@gmail.com",
+		Bod:         bod,
+	}
+	newCustomer.SetId()
+	if err := customerUseCase.RegisterNewCustomer(newCustomer); err != nil {
+		fmt.Println(err)
+		return
+	}
 
-// 	// Get All
-// 	customers, err := customerUseCase.FindAllCustomer()
-// 	if err != nil {
-// 		fmt.Println(err)
-// 	} else {
-// 		for _, c := range customers {
-// 			fmt.Println("ID:", c.Id)
-// 			fmt.Println("Name:", c.FirstName, c.LastName)
-// 			fmt.Println("Phone Number:", c.PhoneNumber)
-// 			fmt.Println("Email:", c.Email)
-// 			fmt.Println("Birth Date:", c.Bod)
-// 			fmt.Println()
-// 		}
-// 	}
-// }
+	// Get All
+	customers, err := customerUseCase.FindAllCustomer()
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		for _, c := range customers {
+			fmt.Println("ID:", c.Id)
+			fmt.Println("Name:", c.FirstName, c.LastName)
+			fmt.Println("Phone Number:", c.PhoneNumber)
+			fmt.Println("Email:", c.Email)
+			fmt.Println("Birth Date:", c.Bod)
+			fmt.Println()
+		}
+	}
+}
 
 // func EmployeeCLI() {
 // 	employeeRepository := repository.NewEmployeeRepository()
