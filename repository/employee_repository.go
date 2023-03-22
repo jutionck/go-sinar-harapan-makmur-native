@@ -34,7 +34,24 @@ func (e *employeeRepository) Create(newData model.Employee) error {
 }
 
 func (e *employeeRepository) List() ([]model.Employee, error) {
-	return nil, nil
+	// sementara (manager_id di hilangkan)
+	// harusnya join ini untuk mendapatkan managerID
+	sql := `SELECT id, first_name, last_name, address, phone_number, email, bod, position, salary FROM employee`
+	rows, err := e.db.Query(sql)
+	if err != nil {
+		return nil, err
+	}
+
+	var employees []model.Employee
+	for rows.Next() {
+		var employee model.Employee
+		err := rows.Scan(&employee.Id, &employee.FirstName, &employee.LastName, &employee.Address, &employee.PhoneNumber, &employee.Email, &employee.Bod, &employee.Posisition, &employee.Salary)
+		if err != nil {
+			return nil, err
+		}
+		employees = append(employees, employee)
+	}
+	return employees, nil
 }
 
 func (e *employeeRepository) Get(id string) (model.Employee, error) {
