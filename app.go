@@ -10,6 +10,7 @@ func main() {
 	figure.Print()
 
 	// delivery.VehicleCLI()
-	delivery.CustomerCLI()
+	// delivery.CustomerCLI()
+	delivery.EmployeeCLI()
 
 }

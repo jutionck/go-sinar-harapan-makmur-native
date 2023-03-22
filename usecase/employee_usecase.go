@@ -15,6 +15,7 @@ type EmployeeUseCase interface {
 	DeleteEmployee(id string) error
 	FindEmployeeByEmail(email string) (model.Employee, error)
 	FindEmployeeByPhoneNumber(phoneNumber string) (model.Employee, error)
+	FindManagerById(id string) (model.Employee, error)
 }
 
 type employeeUseCase struct {
@@ -41,9 +42,19 @@ func (e *employeeUseCase) RegisterNewEmployee(newEmployee model.Employee) error 
 		return fmt.Errorf("FirstName, LastName, PhoneNumber and Email are required fields")
 	}
 
+	if newEmployee.Manager != nil {
+		manager, err := e.FindManagerById(newEmployee.Manager.Id)
+		if err != nil {
+			return fmt.Errorf("Manager with ID: %v exists", newEmployee.Manager.Id)
+		}
+		newEmployee.Manager = &manager
+	} else {
+		newEmployee.Manager = nil
+	}
+
 	err := e.employeeRepo.Create(newEmployee)
 	if err != nil {
-		return fmt.Errorf("Failed to create new vehicle: %v", err)
+		return fmt.Errorf("Failed to create new employee: %v", err)
 	}
 
 	return nil
@@ -73,7 +84,16 @@ func (e *employeeUseCase) UpdateEmployee(newEmployee model.Employee) error {
 		return fmt.Errorf("FirstName, LastName, PhoneNumber and Email are required fields")
 	}
 
-	err := e.employeeRepo.Update(newEmployee)
+	manager, err := e.FindManagerById(newEmployee.Manager.Id)
+	if err != nil {
+		return fmt.Errorf("Manager with ID: %v exists", newEmployee.Manager.Id)
+	}
+
+	if newEmployee.Manager.Id != "" {
+		newEmployee.Manager = &manager
+	}
+
+	err = e.employeeRepo.Update(newEmployee)
 	if err != nil {
 		return fmt.Errorf("Failed to udpate vehicle: %v", err)
 	}
@@ -88,8 +108,13 @@ func (e *employeeUseCase) DeleteEmployee(id string) error {
 func (e *employeeUseCase) FindEmployeeByEmail(email string) (model.Employee, error) {
 	return e.employeeRepo.GetByEmail(email)
 }
+
 func (e *employeeUseCase) FindEmployeeByPhoneNumber(phoneNumber string) (model.Employee, error) {
 	return e.employeeRepo.GetByPhoneNumber(phoneNumber)
+}
+
+func (e *employeeUseCase) FindManagerById(id string) (model.Employee, error) {
+	return e.GetEmployee(id)
 }
 
 func NewEmployeeUseCase(employeeRepo repository.EmployeeRepository) EmployeeUseCase {

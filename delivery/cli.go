@@ -100,28 +100,54 @@ func CustomerCLI() {
 	}
 }
 
-// func EmployeeCLI() {
-// 	employeeRepository := repository.NewEmployeeRepository()
-// 	employeeUseCase := usecase.NewEmployeeUseCase(employeeRepository)
+func EmployeeCLI() {
+	c, err := config.NewConfig()
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	dbConn, _ := config.NewDbConnection(c)
+	defer dbConn.Conn().Close()
 
-// 	// Get All
-// 	employees, err := employeeUseCase.FindAllEmployee()
-// 	if err != nil {
-// 		fmt.Println(err)
-// 	} else {
-// 		for _, e := range employees {
-// 			fmt.Println("ID:", e.Id)
-// 			fmt.Println("Name:", e.FirstName, e.LastName)
-// 			fmt.Println("Phone Number:", e.PhoneNumber)
-// 			fmt.Println("Email:", e.Email)
-// 			fmt.Println("Birth Date:", e.Bod)
-// 			fmt.Println("Position:", e.Posisition)
-// 			fmt.Println("Salary:", e.Salary)
-// 			fmt.Println("Manager:", e.Manager)
-// 			fmt.Println()
-// 		}
-// 	}
-// }
+	employeeRepository := repository.NewEmployeeRepository(dbConn.Conn())
+	employeeUseCase := usecase.NewEmployeeUseCase(employeeRepository)
+
+	// cretae
+	bod, _ := time.Parse("2006-01-02", "1990-11-11")
+	newEmployee := model.Employee{
+		FirstName:   "Tika",
+		LastName:    "Yesi",
+		PhoneNumber: "0821444444",
+		Email:       "tika.yesi@gmail.com",
+		Bod:         bod,
+		Posisition:  "Software Developer",
+		Salary:      15000000,
+		Manager:     &model.Employee{Id: "34258ecc-b35c-4da9-8574-c452475af11f"},
+	}
+	newEmployee.SetId()
+	if err := employeeUseCase.RegisterNewEmployee(newEmployee); err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	// Get All
+	employees, err := employeeUseCase.FindAllEmployee()
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		for _, e := range employees {
+			fmt.Println("ID:", e.Id)
+			fmt.Println("Name:", e.FirstName, e.LastName)
+			fmt.Println("Phone Number:", e.PhoneNumber)
+			fmt.Println("Email:", e.Email)
+			fmt.Println("Birth Date:", e.Bod)
+			fmt.Println("Position:", e.Posisition)
+			fmt.Println("Salary:", e.Salary)
+			fmt.Println("Manager:", e.Manager)
+			fmt.Println()
+		}
+	}
+}
 
 // func TransactionCLI() {
 // 	transactionRepo := repository.NewTransactionRepository()
