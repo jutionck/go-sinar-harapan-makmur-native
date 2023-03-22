@@ -69,7 +69,7 @@ func VehicleCLI() {
 			Limit:  5,
 		},
 	}
-	vehicles, paging := vehicleUseCase.Paging(requestQueryParams)
+	vehicles, paging, err := vehicleUseCase.Paging(requestQueryParams)
 	if err != nil {
 		fmt.Println(err)
 	} else {

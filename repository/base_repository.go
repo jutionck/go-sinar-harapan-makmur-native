@@ -11,5 +11,5 @@ type BaseRepository[T any] interface {
 }
 
 type BaseRepositoryPaging[T any] interface {
-	Paging(requestQueryParams dto.RequestQueryParams) ([]T, dto.Paging)
+	Paging(requestQueryParams dto.RequestQueryParams) ([]T, dto.Paging, error)
 }

@@ -77,7 +77,7 @@ func (v *vehicleRepository) Delete(id string) error {
 	return nil
 }
 
-func (v *vehicleRepository) Paging(requestQueryParams dto.RequestQueryParams) ([]model.Vehicle, dto.Paging) {
+func (v *vehicleRepository) Paging(requestQueryParams dto.RequestQueryParams) ([]model.Vehicle, dto.Paging, error) {
 	var paginationQuery dto.PaginationQuery
 	paginationQuery = common.GetPaginationParams(requestQueryParams.PaginationParam)
 	orderQuery := "ORDER BY id"
@@ -91,7 +91,7 @@ func (v *vehicleRepository) Paging(requestQueryParams dto.RequestQueryParams) ([
 	sql := fmt.Sprintf("SELECT id, brand, model, production_year, color, is_automatic, sale_price, stock, status FROM vehicle %s LIMIT $1 OFFSET $2", orderQuery)
 	rows, err := v.db.Query(sql, paginationQuery.Take, paginationQuery.Skip)
 	if err != nil {
-		return nil, dto.Paging{}
+		return nil, dto.Paging{}, err
 	}
 
 	var vehicle []model.Vehicle
@@ -99,15 +99,15 @@ func (v *vehicleRepository) Paging(requestQueryParams dto.RequestQueryParams) ([
 		var vehilce model.Vehicle
 		err := rows.Scan(&vehilce.Id, &vehilce.Brand, &vehilce.Model, &vehilce.ProductionYear, &vehilce.Color, &vehilce.IsAutomatic, &vehilce.SalePrice, &vehilce.Stock, &vehilce.Status)
 		if err != nil {
-			return nil, dto.Paging{}
+			return nil, dto.Paging{}, err
 		}
 		vehicle = append(vehicle, vehilce)
 	}
 	totalRows, err := v.getTotalRows()
 	if err != nil {
-		return nil, dto.Paging{}
+		return nil, dto.Paging{}, err
 	}
-	return vehicle, common.Paginate(paginationQuery.Page, paginationQuery.Take, totalRows)
+	return vehicle, common.Paginate(paginationQuery.Page, paginationQuery.Take, totalRows), nil
 }
 
 func (v *vehicleRepository) getTotalRows() (int, error) {

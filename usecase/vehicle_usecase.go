@@ -14,7 +14,7 @@ type VehicleUseCase interface {
 	GetVehicle(id string) (model.Vehicle, error)
 	UpdateVehicle(newVehicle model.Vehicle) error
 	DeleteVehicle(id string) error
-	Paging(requestQueryParams dto.RequestQueryParams) ([]model.Vehicle, dto.Paging)
+	Paging(requestQueryParams dto.RequestQueryParams) ([]model.Vehicle, dto.Paging, error)
 }
 
 type vehicleUseCase struct {
@@ -60,7 +60,10 @@ func (v *vehicleUseCase) DeleteVehicle(id string) error {
 	return v.vehicleRepo.Delete(id)
 }
 
-func (v *vehicleUseCase) Paging(requestQueryParams dto.RequestQueryParams) ([]model.Vehicle, dto.Paging) {
+func (v *vehicleUseCase) Paging(requestQueryParams dto.RequestQueryParams) ([]model.Vehicle, dto.Paging, error) {
+	if !requestQueryParams.QueryParams.IsSortValid() {
+		return nil, dto.Paging{}, fmt.Errorf("Invalid sort by: %s", requestQueryParams.QueryParams.Sort)
+	}
 	return v.vehicleRepo.Paging(requestQueryParams)
 }
 
