@@ -13,6 +13,7 @@ type Transaction struct {
 	Customer
 	Employee
 	Type          string // enum: "Online" & "Offline"
+	Qty           int
 	PaymentAmount int
 }
 

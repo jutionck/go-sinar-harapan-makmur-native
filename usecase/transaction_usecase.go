@@ -47,6 +47,11 @@ func (t *transactionUsecase) RegisterNewTransaction(newData entity.Transaction) 
 	newData.TransactionDate = td
 	newData.PaymentAmount = vehicle.SalePrice
 
+	err = t.vehicleUseCase.UpdateVehicleStock(newData.Qty, vehicle.Id)
+	if err != nil {
+		return fmt.Errorf("Failed update vehicle stock")
+	}
+
 	return t.transactionRepo.Create(newData)
 }
 func (t *transactionUsecase) FindAllTransaction() ([]entity.Transaction, error) {

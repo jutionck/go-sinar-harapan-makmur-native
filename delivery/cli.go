@@ -212,33 +212,34 @@ func TransactionCLI() {
 	employeeUseCase := usecase.NewEmployeeUseCase(repository.NewEmployeeRepository(dbConn.Conn()))
 
 	transactionUseCase := usecase.NewTransactionUseCase(transactionRepo, vehicleUseCase, customerUseCase, employeeUseCase)
-	// newTransaction := entity.Transaction{
-	// 	Id:       "T0001",
-	// 	Vehicle:  entity.Vehicle{Id: "b3a41ff7-a5af-4f04-b0e5-19e7451a8556"},
-	// 	Customer: entity.Customer{Id: "afc49d21-a381-42f0-8f0b-d94d4148d8e1"},
-	// 	Employee: entity.Employee{Id: "15c68c8f-eff0-42cc-a8dd-903be384fa8a"},
-	// 	Type:     "Online",
-	// }
+	newTransaction := entity.Transaction{
+		Id:       "T0001",
+		Vehicle:  entity.Vehicle{Id: "b3a41ff7-a5af-4f04-b0e5-19e7451a8556"},
+		Customer: entity.Customer{Id: "afc49d21-a381-42f0-8f0b-d94d4148d8e1"},
+		Employee: entity.Employee{Id: "15c68c8f-eff0-42cc-a8dd-903be384fa8a"},
+		Type:     "Online",
+		Qty:      1,
+	}
 
-	// if err := transactionUseCase.RegisterNewTransaction(newTransaction); err != nil {
-	// 	fmt.Println(err)
-	// 	return
-	// }
+	if err := transactionUseCase.RegisterNewTransaction(newTransaction); err != nil {
+		fmt.Println(err)
+		return
+	}
 
 	// Get All
-	transactions, err := transactionUseCase.FindAllTransaction()
-	if err != nil {
-		fmt.Println(err)
-	} else {
-		for _, t := range transactions {
-			fmt.Println("ID:", t.Id)
-			fmt.Println("Date:", t.TransactionDate)
-			fmt.Println("Vehicle:", t.Vehicle.Brand, t.Vehicle.Model)
-			fmt.Println("Customer:", t.Customer.FirstName, t.Customer.LastName)
-			fmt.Println("Employee:", t.Employee.FirstName, t.Employee.LastName)
-			fmt.Println("Type:", t.Type)
-			fmt.Println("Payment Amount:", t.PaymentAmount)
-			fmt.Println()
-		}
-	}
+	// transactions, err := transactionUseCase.FindAllTransaction()
+	// if err != nil {
+	// 	fmt.Println(err)
+	// } else {
+	// 	for _, t := range transactions {
+	// 		fmt.Println("ID:", t.Id)
+	// 		fmt.Println("Date:", t.TransactionDate)
+	// 		fmt.Println("Vehicle:", t.Vehicle.Brand, t.Vehicle.Model)
+	// 		fmt.Println("Customer:", t.Customer.FirstName, t.Customer.LastName)
+	// 		fmt.Println("Employee:", t.Employee.FirstName, t.Employee.LastName)
+	// 		fmt.Println("Type:", t.Type)
+	// 		fmt.Println("Payment Amount:", t.PaymentAmount)
+	// 		fmt.Println()
+	// 	}
+	// }
 }

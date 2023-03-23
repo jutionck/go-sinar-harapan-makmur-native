@@ -17,6 +17,7 @@ type VehicleUseCase interface {
 	Paging(requestQueryParams dto.RequestQueryParams) ([]entity.Vehicle, dto.Paging, error)
 	Count(sql string) (int, error)
 	GroupBy(selectedBy string, whereBy map[string]interface{}, groupBy string) ([]dto.VehicleGroupCountDto, error)
+	UpdateVehicleStock(count int, id string) error
 }
 
 type vehicleUseCase struct {
@@ -94,6 +95,10 @@ func (v *vehicleUseCase) Count(sql string) (int, error) {
 
 func (v *vehicleUseCase) GroupBy(selectedBy string, whereBy map[string]interface{}, groupBy string) ([]dto.VehicleGroupCountDto, error) {
 	return v.vehicleRepo.GroupBy(selectedBy, whereBy, groupBy)
+}
+
+func (v *vehicleUseCase) UpdateVehicleStock(count int, id string) error {
+	return v.vehicleRepo.UpdateStock(count, id)
 }
 
 func NewVehicleUseCase(vehicleRepo repository.VehicleRepository) VehicleUseCase {

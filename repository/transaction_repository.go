@@ -17,8 +17,8 @@ type transactionRepository struct {
 }
 
 func (t *transactionRepository) Create(newData entity.Transaction) error {
-	sql := "INSERT INTO transaction (id, transaction_date, vehicle_id, customer_id, employee_id, type, payment_amount) VALUES ($1,$2,$3,$4,$5,$6,$7)"
-	_, err := t.db.Exec(sql, newData.Id, newData.TransactionDate, newData.Vehicle.Id, newData.Customer.Id, newData.Employee.Id, newData.Type, newData.PaymentAmount)
+	sql := "INSERT INTO transaction (id, transaction_date, vehicle_id, customer_id, employee_id, type, qty, payment_amount) VALUES ($1,$2,$3,$4,$5,$6,$7,$8)"
+	_, err := t.db.Exec(sql, newData.Id, newData.TransactionDate, newData.Vehicle.Id, newData.Customer.Id, newData.Employee.Id, newData.Type, newData.Qty, newData.PaymentAmount)
 	if err != nil {
 		return err
 	}
@@ -28,6 +28,7 @@ func (t *transactionRepository) Create(newData entity.Transaction) error {
 func (t *transactionRepository) List() ([]entity.Transaction, error) {
 	return nil, nil
 }
+
 func (t *transactionRepository) Get(id string) (entity.Transaction, error) {
 	return entity.Transaction{}, nil
 }

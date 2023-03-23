@@ -14,6 +14,7 @@ type VehicleRepository interface {
 	BaseRepository[entity.Vehicle]
 	BaseRepositoryPaging[entity.Vehicle]
 	BaseRepositoryAggregate[dto.VehicleGroupCountDto]
+	UpdateStock(count int, id string) error
 }
 
 type vehicleRepository struct {
@@ -160,6 +161,15 @@ func (v *vehicleRepository) GroupBy(selectedBy string, whereBy map[string]interf
 	}
 
 	return vehicles, nil
+}
+
+func (v *vehicleRepository) UpdateStock(count int, id string) error {
+	sql := "UPDATE vehicle SET stock = stock - $1 WHERE id = $2"
+	_, err := v.db.Exec(sql, count, id)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func NewVehicleRepository(db *sql.DB) VehicleRepository {
