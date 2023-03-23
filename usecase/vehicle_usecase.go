@@ -15,6 +15,8 @@ type VehicleUseCase interface {
 	UpdateVehicle(newVehicle entity.Vehicle) error
 	DeleteVehicle(id string) error
 	Paging(requestQueryParams dto.RequestQueryParams) ([]entity.Vehicle, dto.Paging, error)
+	Count(sql string) (int, error)
+	GroupBy(selectedBy string, whereBy map[string]interface{}, groupBy string) ([]dto.VehicleGroupCountDto, error)
 }
 
 type vehicleUseCase struct {
@@ -84,6 +86,14 @@ func vehicleValidation(payload entity.Vehicle) error {
 		return fmt.Errorf("Stock can't negative ")
 	}
 	return nil
+}
+
+func (v *vehicleUseCase) Count(sql string) (int, error) {
+	return v.vehicleRepo.Count(sql)
+}
+
+func (v *vehicleUseCase) GroupBy(selectedBy string, whereBy map[string]interface{}, groupBy string) ([]dto.VehicleGroupCountDto, error) {
+	return v.vehicleRepo.GroupBy(selectedBy, whereBy, groupBy)
 }
 
 func NewVehicleUseCase(vehicleRepo repository.VehicleRepository) VehicleUseCase {

@@ -3,6 +3,7 @@ package repository
 import (
 	"database/sql"
 	"fmt"
+	"strings"
 
 	"github.com/jutionck/golang-db-sinar-harapan-makmur/model/dto"
 	"github.com/jutionck/golang-db-sinar-harapan-makmur/model/entity"
@@ -12,6 +13,7 @@ import (
 type VehicleRepository interface {
 	BaseRepository[entity.Vehicle]
 	BaseRepositoryPaging[entity.Vehicle]
+	BaseRepositoryAggregate[dto.VehicleGroupCountDto]
 }
 
 type vehicleRepository struct {
@@ -103,17 +105,15 @@ func (v *vehicleRepository) Paging(requestQueryParams dto.RequestQueryParams) ([
 		}
 		vehicle = append(vehicle, vehilce)
 	}
-	totalRows, err := v.getTotalRows()
+	totalRows, err := v.Count("SELECT COUNT(*) FROM vehicle")
 	if err != nil {
 		return nil, dto.Paging{}, err
 	}
 	return vehicle, common.Paginate(paginationQuery.Page, paginationQuery.Take, totalRows), nil
 }
 
-func (v *vehicleRepository) getTotalRows() (int, error) {
-	sql := `SELECT COUNT(*) FROM vehicle`
+func (v *vehicleRepository) Count(sql string) (int, error) {
 	row := v.db.QueryRow(sql)
-
 	var count int
 	err := row.Scan(&count)
 	if err != nil {
@@ -121,6 +121,45 @@ func (v *vehicleRepository) getTotalRows() (int, error) {
 	}
 
 	return count, nil
+}
+
+func (v *vehicleRepository) GroupBy(selectedBy string, whereBy map[string]interface{}, groupBy string) ([]dto.VehicleGroupCountDto, error) {
+	var vehicles []dto.VehicleGroupCountDto
+
+	// Build the SQL query
+	query := fmt.Sprintf("SELECT %s, COUNT(*) AS total_count FROM vehicle", selectedBy)
+	if len(whereBy) > 0 {
+		query += " WHERE "
+		for k, v := range whereBy {
+			query += fmt.Sprintf("%s=%v AND ", k, v)
+		}
+		query = strings.TrimSuffix(query, " AND ")
+	}
+	query += fmt.Sprintf(" GROUP BY %s", groupBy)
+
+	// Execute the query
+	rows, err := v.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	// Map the query result to entity.Vehicle objects
+	for rows.Next() {
+		var vehicle dto.VehicleGroupCountDto
+		err := rows.Scan(&vehicle.FieldName, &vehicle.FieldCount)
+		if err != nil {
+			return nil, err
+		}
+		vehicles = append(vehicles, vehicle)
+	}
+
+	err = rows.Err()
+	if err != nil {
+		return nil, err
+	}
+
+	return vehicles, nil
 }
 
 func NewVehicleRepository(db *sql.DB) VehicleRepository {

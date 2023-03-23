@@ -13,3 +13,8 @@ type BaseRepository[T any] interface {
 type BaseRepositoryPaging[T any] interface {
 	Paging(requestQueryParams dto.RequestQueryParams) ([]T, dto.Paging, error)
 }
+
+type BaseRepositoryAggregate[T any] interface {
+	Count(sql string) (int, error)
+	GroupBy(selectedBy string, whereBy map[string]interface{}, groupBy string) ([]T, error)
+}

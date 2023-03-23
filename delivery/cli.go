@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/jutionck/golang-db-sinar-harapan-makmur/config"
-	"github.com/jutionck/golang-db-sinar-harapan-makmur/model/dto"
 	"github.com/jutionck/golang-db-sinar-harapan-makmur/model/entity"
 	"github.com/jutionck/golang-db-sinar-harapan-makmur/repository"
 	"github.com/jutionck/golang-db-sinar-harapan-makmur/usecase"
@@ -58,38 +57,49 @@ func VehicleCLI() {
 	// }
 
 	// Paging
-	requestQueryParams := dto.RequestQueryParams{
-		QueryParams: dto.QueryParams{
-			Order: "model",
-			Sort:  "asc",
-		},
-		PaginationParam: dto.PaginationParam{
-			Page:   1,
-			Offset: 0,
-			Limit:  5,
-		},
-	}
-	vehicles, paging, err := vehicleUseCase.Paging(requestQueryParams)
+	// requestQueryParams := dto.RequestQueryParams{
+	// 	QueryParams: dto.QueryParams{
+	// 		Order: "model",
+	// 		Sort:  "asc",
+	// 	},
+	// 	PaginationParam: dto.PaginationParam{
+	// 		Page:   1,
+	// 		Offset: 0,
+	// 		Limit:  5,
+	// 	},
+	// }
+	// vehicles, paging, err := vehicleUseCase.Paging(requestQueryParams)
+	// if err != nil {
+	// 	fmt.Println(err)
+	// } else {
+	// 	for _, v := range vehicles {
+	// 		fmt.Println("ID:", v.Id)
+	// 		fmt.Println("Brand:", v.Brand)
+	// 		fmt.Println("Model:", v.Model)
+	// 		fmt.Println("Production Year:", v.ProductionYear)
+	// 		fmt.Println("Color:", v.Color)
+	// 		fmt.Println("Price:", v.SalePrice)
+	// 		fmt.Println("Is Automatic:", v.IsAutomatic)
+	// 		fmt.Println("Stock:", v.Stock)
+	// 		fmt.Println("Status:", v.Status)
+	// 		fmt.Println()
+	// 	}
+	// 	fmt.Println("Paging:")
+	// 	fmt.Println("page:", paging.Page)
+	// 	fmt.Println("totalPages:", paging.TotalPages)
+	// 	fmt.Println("totalRows:", paging.TotalRows)
+	// 	fmt.Println("rowsPerPage:", paging.RowsPerPage)
+	// }
+
+	// Group By
+	whereBy := map[string]interface{}{"production_year": 2022}
+	vehiclesGroupCount, err := vehicleUseCase.GroupBy("brand", whereBy, "brand")
 	if err != nil {
-		fmt.Println(err)
+		// handle error
 	} else {
-		for _, v := range vehicles {
-			fmt.Println("ID:", v.Id)
-			fmt.Println("Brand:", v.Brand)
-			fmt.Println("Model:", v.Model)
-			fmt.Println("Production Year:", v.ProductionYear)
-			fmt.Println("Color:", v.Color)
-			fmt.Println("Price:", v.SalePrice)
-			fmt.Println("Is Automatic:", v.IsAutomatic)
-			fmt.Println("Stock:", v.Stock)
-			fmt.Println("Status:", v.Status)
-			fmt.Println()
+		for _, v := range vehiclesGroupCount {
+			fmt.Printf("Brand: %s, Total: %d\n", v.FieldName, v.FieldCount)
 		}
-		fmt.Println("Paging:")
-		fmt.Println("page:", paging.Page)
-		fmt.Println("totalPages:", paging.TotalPages)
-		fmt.Println("totalRows:", paging.TotalRows)
-		fmt.Println("rowsPerPage:", paging.RowsPerPage)
 	}
 }
 
@@ -148,17 +158,19 @@ func EmployeeCLI() {
 	employeeRepository := repository.NewEmployeeRepository(dbConn.Conn())
 	employeeUseCase := usecase.NewEmployeeUseCase(employeeRepository)
 
+	manager, err := employeeUseCase.FindManagerById("34258ecc-b35c-4da9-8574-c452475af11f")
+
 	// cretae
 	bod, _ := time.Parse("2006-01-02", "1990-11-11")
 	newEmployee := entity.Employee{
-		FirstName:   "Tika",
-		LastName:    "Yesi",
-		PhoneNumber: "0821444444",
-		Email:       "tika.yesi@gmail.com",
+		FirstName:   "Tikas",
+		LastName:    "Yesis",
+		PhoneNumber: "08214444442",
+		Email:       "tika.yesis@gmail.com",
 		Bod:         bod,
 		Posisition:  "Software Developer",
 		Salary:      15000000,
-		Manager:     &entity.Employee{Id: "34258ecc-b35c-4da9-8574-c452475af11f"},
+		Manager:     &manager,
 	}
 	newEmployee.SetId()
 	if err := employeeUseCase.RegisterNewEmployee(newEmployee); err != nil {
