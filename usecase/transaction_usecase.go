@@ -12,7 +12,7 @@ import (
 type TransactionUseCase interface {
 	RegisterNewTransaction(newData entity.Transaction) error
 	FindAllTransaction() ([]dto.TransactionResponseDto, error)
-	FindTransactionById(id string) (entity.Transaction, error)
+	FindTransactionById(id string) (dto.TransactionResponseDto, error)
 	GetAll() ([]entity.Transaction, error)
 }
 
@@ -69,7 +69,7 @@ func (t *transactionUsecase) GetAll() ([]entity.Transaction, error) {
 	return t.transactionRepo.GetAll()
 }
 
-func (t *transactionUsecase) FindTransactionById(id string) (entity.Transaction, error) {
+func (t *transactionUsecase) FindTransactionById(id string) (dto.TransactionResponseDto, error) {
 	return t.transactionRepo.Get(id)
 }
 

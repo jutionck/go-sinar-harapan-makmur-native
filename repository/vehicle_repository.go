@@ -1,10 +1,10 @@
 package repository
 
 import (
-	"database/sql"
 	"fmt"
 	"strings"
 
+	"github.com/jmoiron/sqlx"
 	"github.com/jutionck/golang-db-sinar-harapan-makmur/model/dto"
 	"github.com/jutionck/golang-db-sinar-harapan-makmur/model/entity"
 	"github.com/jutionck/golang-db-sinar-harapan-makmur/utils/common"
@@ -18,12 +18,12 @@ type VehicleRepository interface {
 }
 
 type vehicleRepository struct {
-	db *sql.DB
+	db *sqlx.DB
 }
 
 func (v *vehicleRepository) Create(newData entity.Vehicle) error {
-	sql := "INSERT INTO vehicle (id, brand, model, production_year, color, is_automatic, sale_price, stock, status) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)"
-	_, err := v.db.Exec(sql, newData.Id, newData.Brand, newData.Model, newData.ProductionYear, newData.Color, newData.IsAutomatic, newData.SalePrice, newData.Stock, newData.Status)
+	sql := "INSERT INTO vehicle (id, brand, model, production_year, color, is_automatic, sale_price, stock, status) VALUES (:id, :brand, :model, :production_year, :color, :is_automatic, :sale_price, :stock, :status)"
+	_, err := v.db.NamedExec(sql, newData)
 	if err != nil {
 		return err
 	}
@@ -32,37 +32,28 @@ func (v *vehicleRepository) Create(newData entity.Vehicle) error {
 }
 
 func (v *vehicleRepository) List() ([]entity.Vehicle, error) {
+	var vehicles []entity.Vehicle
 	sql := `SELECT id, brand, model, production_year, color, is_automatic, sale_price, stock, status FROM vehicle`
-	rows, err := v.db.Query(sql)
+	err := v.db.Select(&vehicles, sql)
 	if err != nil {
 		return nil, err
 	}
+	return vehicles, nil
+}
 
-	var vehicle []entity.Vehicle
-	for rows.Next() {
-		var vehilce entity.Vehicle
-		err := rows.Scan(&vehilce.Id, &vehilce.Brand, &vehilce.Model, &vehilce.ProductionYear, &vehilce.Color, &vehilce.IsAutomatic, &vehilce.SalePrice, &vehilce.Stock, &vehilce.Status)
-		if err != nil {
-			return nil, err
-		}
-		vehicle = append(vehicle, vehilce)
+func (v *vehicleRepository) Get(id string) (entity.Vehicle, error) {
+	var vehicle entity.Vehicle
+	sql := `SELECT id, brand, model, production_year, color, is_automatic, sale_price, stock, status FROM vehicle WHERE id = $1`
+	err := v.db.Get(&vehicle, sql, id)
+	if err != nil {
+		return entity.Vehicle{}, err
 	}
 	return vehicle, nil
 }
 
-func (v *vehicleRepository) Get(id string) (entity.Vehicle, error) {
-	sql := `SELECT id, brand, model, production_year, color, is_automatic, sale_price, stock, status FROM vehicle WHERE id = $1`
-	var vehilce entity.Vehicle
-	err := v.db.QueryRow(sql, id).Scan(&vehilce.Id, &vehilce.Brand, &vehilce.Model, &vehilce.ProductionYear, &vehilce.Color, &vehilce.IsAutomatic, &vehilce.SalePrice, &vehilce.Stock, &vehilce.Status)
-	if err != nil {
-		return entity.Vehicle{}, err
-	}
-	return vehilce, nil
-}
-
 func (v *vehicleRepository) Update(newData entity.Vehicle) error {
-	sql := "UPDATE vehicle set brand = $1, model = $2, production_year = $3, color = $4, is_automatic = $5, sale_price = $6, stock = $7, status = $8 WHERE id = $9"
-	_, err := v.db.Exec(sql, &newData.Brand, &newData.Model, &newData.ProductionYear, &newData.Color, &newData.IsAutomatic, &newData.SalePrice, &newData.Stock, &newData.Status, newData.Id)
+	sql := "UPDATE vehicle set brand = :brand, model = :model, production_year = :production_year, color = :color, is_automatic = :is_automatic, sale_price = :sale_price, stock = :stock, status = :status WHERE id = :id"
+	_, err := v.db.NamedExec(sql, &newData)
 	if err != nil {
 		return err
 	}
@@ -82,6 +73,7 @@ func (v *vehicleRepository) Delete(id string) error {
 
 func (v *vehicleRepository) Paging(requestQueryParams dto.RequestQueryParams) ([]entity.Vehicle, dto.Paging, error) {
 	var paginationQuery dto.PaginationQuery
+	var vehicles []entity.Vehicle
 	paginationQuery = common.GetPaginationParams(requestQueryParams.PaginationParam)
 	orderQuery := "ORDER BY id"
 	if requestQueryParams.QueryParams.Order != "" && requestQueryParams.QueryParams.Sort != "" {
@@ -92,29 +84,20 @@ func (v *vehicleRepository) Paging(requestQueryParams dto.RequestQueryParams) ([
 		orderQuery = fmt.Sprintf("ORDER BY %s %s", requestQueryParams.QueryParams.Order, sorting)
 	}
 	sql := fmt.Sprintf("SELECT id, brand, model, production_year, color, is_automatic, sale_price, stock, status FROM vehicle %s LIMIT $1 OFFSET $2", orderQuery)
-	rows, err := v.db.Query(sql, paginationQuery.Take, paginationQuery.Skip)
+	err := v.db.Select(&vehicles, sql, paginationQuery.Take, paginationQuery.Skip)
 	if err != nil {
 		return nil, dto.Paging{}, err
 	}
 
-	var vehicle []entity.Vehicle
-	for rows.Next() {
-		var vehilce entity.Vehicle
-		err := rows.Scan(&vehilce.Id, &vehilce.Brand, &vehilce.Model, &vehilce.ProductionYear, &vehilce.Color, &vehilce.IsAutomatic, &vehilce.SalePrice, &vehilce.Stock, &vehilce.Status)
-		if err != nil {
-			return nil, dto.Paging{}, err
-		}
-		vehicle = append(vehicle, vehilce)
-	}
 	totalRows, err := v.Count("SELECT COUNT(*) FROM vehicle")
 	if err != nil {
 		return nil, dto.Paging{}, err
 	}
-	return vehicle, common.Paginate(paginationQuery.Page, paginationQuery.Take, totalRows), nil
+	return vehicles, common.Paginate(paginationQuery.Page, paginationQuery.Take, totalRows), nil
 }
 
 func (v *vehicleRepository) Count(sql string) (int, error) {
-	row := v.db.QueryRow(sql)
+	row := v.db.QueryRowx(sql)
 	var count int
 	err := row.Scan(&count)
 	if err != nil {
@@ -139,7 +122,7 @@ func (v *vehicleRepository) GroupBy(selectedBy string, whereBy map[string]interf
 	query += fmt.Sprintf(" GROUP BY %s", groupBy)
 
 	// Execute the query
-	rows, err := v.db.Query(query)
+	rows, err := v.db.Queryx(query)
 	if err != nil {
 		return nil, err
 	}
@@ -172,6 +155,6 @@ func (v *vehicleRepository) UpdateStock(count int, id string) error {
 	return nil
 }
 
-func NewVehicleRepository(db *sql.DB) VehicleRepository {
+func NewVehicleRepository(db *sqlx.DB) VehicleRepository {
 	return &vehicleRepository{db: db}
 }

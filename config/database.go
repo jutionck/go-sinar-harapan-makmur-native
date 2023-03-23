@@ -1,24 +1,24 @@
 package config
 
 import (
-	"database/sql"
 	"fmt"
 
+	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 )
 
 type DbConnection interface {
-	Conn() *sql.DB
+	Conn() *sqlx.DB
 }
 
 type dbConnection struct {
-	db  *sql.DB
+	db  *sqlx.DB
 	cfg *Config
 }
 
 func (d *dbConnection) initDb() error {
 	psqlconn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", d.cfg.Host, d.cfg.Port, d.cfg.User, d.cfg.Password, d.cfg.Name)
-	db, err := sql.Open(d.cfg.Driver, psqlconn)
+	db, err := sqlx.Connect(d.cfg.Driver, psqlconn)
 	if err != nil {
 		return err
 	}
@@ -31,7 +31,7 @@ func (d *dbConnection) initDb() error {
 	return nil
 }
 
-func (d *dbConnection) Conn() *sql.DB {
+func (d *dbConnection) Conn() *sqlx.DB {
 	return d.db
 }
 

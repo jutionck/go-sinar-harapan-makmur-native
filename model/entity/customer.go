@@ -8,10 +8,10 @@ import (
 
 type Customer struct {
 	Id          string
-	FirstName   string
-	LastName    string
+	FirstName   string `db:"first_name"`
+	LastName    string `db:"last_name"`
 	Address     string
-	PhoneNumber string
+	PhoneNumber string `db:"phone_number"`
 	Email       string
 	Bod         time.Time
 }

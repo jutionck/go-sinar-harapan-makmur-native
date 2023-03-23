@@ -8,13 +8,13 @@ import (
 
 type Transaction struct {
 	Id              string
-	TransactionDate time.Time
-	Vehicle
-	Customer
-	Employee
-	Type          string // enum: "Online" & "Offline"
-	Qty           int
-	PaymentAmount int
+	TransactionDate time.Time `db:"transaction_date"`
+	Vehicle         Vehicle   `db:"vehicle_id"`
+	Customer        Customer  `db:"customer_id"`
+	Employee        Employee  `db:"employee_id"`
+	Type            string    // enum: "Online" & "Offline"
+	Qty             int
+	PaymentAmount   int `db:"payment_amount"`
 }
 
 func (t *Transaction) IsValidType() bool {

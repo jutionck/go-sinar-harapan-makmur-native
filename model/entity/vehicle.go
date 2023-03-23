@@ -6,11 +6,11 @@ type Vehicle struct {
 	Id             string
 	Brand          string
 	Model          string
-	ProductionYear int
+	ProductionYear int `db:"production_year"`
 	Color          string
-	IsAutomatic    bool
+	IsAutomatic    bool `db:"is_automatic"`
 	Stock          int
-	SalePrice      int
+	SalePrice      int    `db:"sale_price"`
 	Status         string // enum: "Baru" & "Bekas"
 }
 
