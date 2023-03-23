@@ -1,6 +1,8 @@
 package repository
 
 import (
+	"fmt"
+
 	"github.com/jmoiron/sqlx"
 	"github.com/jutionck/golang-db-sinar-harapan-makmur/model/dto"
 	"github.com/jutionck/golang-db-sinar-harapan-makmur/model/entity"
@@ -18,6 +20,10 @@ type transactionRepository struct {
 }
 
 func (t *transactionRepository) Create(newData entity.Transaction) error {
+	tx, err := t.db.Beginx()
+	if err != nil {
+		return err
+	}
 	sql := "INSERT INTO transaction (id, transaction_date, vehicle_id, customer_id, employee_id, type, qty, payment_amount) VALUES (:id, :transaction_date, :vehicle_id, :customer_id, :employee_id, :type, :qty, :payment_amount)"
 
 	namedArgs := map[string]interface{}{
@@ -30,10 +36,28 @@ func (t *transactionRepository) Create(newData entity.Transaction) error {
 		"qty":              newData.Qty,
 		"payment_amount":   newData.PaymentAmount,
 	}
-	_, err := t.db.NamedExec(sql, namedArgs)
+
+	result, err := tx.NamedExec(sql, namedArgs)
 	if err != nil {
+		tx.Rollback()
 		return err
 	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		tx.Rollback()
+		return err
+	} else if rowsAffected == 0 {
+		tx.Rollback()
+		return fmt.Errorf("no rows affected")
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
 	return nil
 }
 

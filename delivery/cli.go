@@ -1,6 +1,7 @@
 package delivery
 
 import (
+	"database/sql"
 	"fmt"
 
 	"github.com/jutionck/golang-db-sinar-harapan-makmur/config"
@@ -235,18 +236,18 @@ func TransactionCLI() {
 	employeeUseCase := usecase.NewEmployeeUseCase(repository.NewEmployeeRepository(dbConn.Conn()))
 
 	transactionUseCase := usecase.NewTransactionUseCase(transactionRepo, vehicleUseCase, customerUseCase, employeeUseCase)
-	// newTransaction := entity.Transaction{
-	// 	Vehicle:  entity.Vehicle{Id: "b3a41ff7-a5af-4f04-b0e5-19e7451a8556"},
-	// 	Customer: entity.Customer{Id: "afc49d21-a381-42f0-8f0b-d94d4148d8e1"},
-	// 	Employee: entity.Employee{Id: sql.NullString{String: "15c68c8f-eff0-42cc-a8dd-903be384fa8a"}},
-	// 	Type:     "Online",
-	// 	Qty:      1,
-	// }
-	// newTransaction.SetId()
-	// if err := transactionUseCase.RegisterNewTransaction(newTransaction); err != nil {
-	// 	fmt.Println(err)
-	// 	return
-	// }
+	newTransaction := entity.Transaction{
+		Vehicle:  entity.Vehicle{Id: "b3a41ff7-a5af-4f04-b0e5-19e7451a8556"},
+		Customer: entity.Customer{Id: "afc49d21-a381-42f0-8f0b-d94d4148d8e1"},
+		Employee: entity.Employee{Id: sql.NullString{String: "15c68c8f-eff0-42cc-a8dd-903be384fa8a"}},
+		Type:     "Online",
+		Qty:      1,
+	}
+	newTransaction.SetId()
+	if err := transactionUseCase.RegisterNewTransaction(newTransaction); err != nil {
+		fmt.Println(err)
+		return
+	}
 
 	// FindAllTransaction
 	// transactions, err := transactionUseCase.FindAllTransaction()
@@ -283,21 +284,21 @@ func TransactionCLI() {
 	// }
 
 	// FindAllTransaction
-	transactions, err := transactionUseCase.GetAll()
-	if err != nil {
-		fmt.Println(err)
-	} else {
-		for _, t := range transactions {
-			fmt.Println("ID:", t.Id)
-			fmt.Println("Date:", t.TransactionDate)
-			fmt.Println("Customer:", t.Customer)
-			fmt.Println("Vehicle:", t.Vehicle)
-			fmt.Println("Employee:", t.Employee)
-			fmt.Println("Employee Manager:", t.Employee.Manager)
-			fmt.Println("Type:", t.Type)
-			fmt.Println("Payment Amount:", t.PaymentAmount)
-			fmt.Println("Qty:", t.Qty)
-			fmt.Println()
-		}
-	}
+	// transactions, err := transactionUseCase.GetAll()
+	// if err != nil {
+	// 	fmt.Println(err)
+	// } else {
+	// 	for _, t := range transactions {
+	// 		fmt.Println("ID:", t.Id)
+	// 		fmt.Println("Date:", t.TransactionDate)
+	// 		fmt.Println("Customer:", t.Customer)
+	// 		fmt.Println("Vehicle:", t.Vehicle)
+	// 		fmt.Println("Employee:", t.Employee)
+	// 		fmt.Println("Employee Manager:", t.Employee.Manager)
+	// 		fmt.Println("Type:", t.Type)
+	// 		fmt.Println("Payment Amount:", t.PaymentAmount)
+	// 		fmt.Println("Qty:", t.Qty)
+	// 		fmt.Println()
+	// 	}
+	// }
 }
