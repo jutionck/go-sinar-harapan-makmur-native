@@ -97,7 +97,15 @@ func NewEmployeeRepository() EmployeeRepository {
 			PhoneNumber: "0857282829",
 			Posisition:  "Staff A",
 			Salary:      85000000,
-			Manager:     &model.Employee{Id: "EP001"},
+			Manager: &model.Employee{
+				Id:          "EP001",
+				FirstName:   "Edo",
+				LastName:    "Sensei",
+				Email:       "edo.sensei@gmail.com",
+				PhoneNumber: "0878282829",
+				Posisition:  "Manager",
+				Salary:      25000000,
+			},
 		},
 		{
 			Id:          "EP003",
@@ -107,7 +115,15 @@ func NewEmployeeRepository() EmployeeRepository {
 			PhoneNumber: "0812282829",
 			Posisition:  "Staff B",
 			Salary:      7500000,
-			Manager:     &model.Employee{Id: "EP001"},
+			Manager: &model.Employee{
+				Id:          "EP001",
+				FirstName:   "Edo",
+				LastName:    "Sensei",
+				Email:       "edo.sensei@gmail.com",
+				PhoneNumber: "0878282829",
+				Posisition:  "Manager",
+				Salary:      25000000,
+			},
 		},
 	}
 	return &employeeRepository{db: employees}

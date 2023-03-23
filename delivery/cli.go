@@ -89,6 +89,25 @@ func EmployeeCLI() {
 	employeeRepository := repository.NewEmployeeRepository()
 	employeeUseCase := usecase.NewEmployeeUseCase(employeeRepository)
 
+	// cretae
+	bod, _ := time.Parse("2006-01-02", "1990-11-11")
+	newEmployee := model.Employee{
+		Id:          "EP004",
+		FirstName:   "Irfan",
+		LastName:    "Dadi",
+		Email:       "irfan.dadi@gmail.com",
+		PhoneNumber: "087828292992",
+		Bod:         bod,
+		Posisition:  "Staff Training Ops",
+		Salary:      5000000,
+		Manager:     &model.Employee{Id: "EP001"},
+	}
+
+	if err := employeeUseCase.RegisterNewEmployee(newEmployee); err != nil {
+		fmt.Println(err)
+		return
+	}
+
 	// Get All
 	employees, err := employeeUseCase.FindAllEmployee()
 	if err != nil {

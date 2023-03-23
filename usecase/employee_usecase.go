@@ -15,6 +15,7 @@ type EmployeeUseCase interface {
 	DeleteEmployee(id string) error
 	FindEmployeeByEmail(email string) (model.Employee, error)
 	FindEmployeeByPhoneNumber(phoneNumber string) (model.Employee, error)
+	FindEmployeeManagerById(managerId string) (model.Employee, error)
 }
 
 type employeeUseCase struct {
@@ -41,6 +42,8 @@ func (e *employeeUseCase) RegisterNewEmployee(newEmployee model.Employee) error 
 		return fmt.Errorf("FirstName, LastName, PhoneNumber and Email are required fields")
 	}
 
+	manager, _ := e.FindEmployeeManagerById(newEmployee.Manager.Id)
+	newEmployee.Manager = &manager
 	err := e.employeeRepo.Create(newEmployee)
 	if err != nil {
 		return fmt.Errorf("Failed to create new vehicle: %v", err)
@@ -88,8 +91,13 @@ func (e *employeeUseCase) DeleteEmployee(id string) error {
 func (e *employeeUseCase) FindEmployeeByEmail(email string) (model.Employee, error) {
 	return e.employeeRepo.GetByEmail(email)
 }
+
 func (e *employeeUseCase) FindEmployeeByPhoneNumber(phoneNumber string) (model.Employee, error) {
 	return e.employeeRepo.GetByPhoneNumber(phoneNumber)
+}
+
+func (e *employeeUseCase) FindEmployeeManagerById(managerId string) (model.Employee, error) {
+	return e.GetEmployee(managerId)
 }
 
 func NewEmployeeUseCase(employeeRepo repository.EmployeeRepository) EmployeeUseCase {
