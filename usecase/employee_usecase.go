@@ -42,8 +42,13 @@ func (e *employeeUseCase) RegisterNewEmployee(newEmployee model.Employee) error 
 		return fmt.Errorf("FirstName, LastName, PhoneNumber and Email are required fields")
 	}
 
-	manager, _ := e.FindEmployeeManagerById(newEmployee.Manager.Id)
-	newEmployee.Manager = &manager
+	if newEmployee.Manager != nil {
+		manager, _ := e.FindEmployeeManagerById(newEmployee.Manager.Id)
+		newEmployee.Manager = &manager
+	} else {
+		newEmployee.Manager = nil
+	}
+
 	err := e.employeeRepo.Create(newEmployee)
 	if err != nil {
 		return fmt.Errorf("Failed to create new vehicle: %v", err)
@@ -74,6 +79,13 @@ func (e *employeeUseCase) UpdateEmployee(newEmployee model.Employee) error {
 
 	if newEmployee.FirstName == "" || newEmployee.LastName == "" || newEmployee.PhoneNumber == "" || newEmployee.Email == "" {
 		return fmt.Errorf("FirstName, LastName, PhoneNumber and Email are required fields")
+	}
+
+	if newEmployee.Manager != nil {
+		manager, _ := e.FindEmployeeManagerById(newEmployee.Manager.Id)
+		newEmployee.Manager = &manager
+	} else {
+		newEmployee.Manager = nil
 	}
 
 	err := e.employeeRepo.Update(newEmployee)
