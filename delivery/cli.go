@@ -158,43 +158,59 @@ func EmployeeCLI() {
 	employeeRepository := repository.NewEmployeeRepository(dbConn.Conn())
 	employeeUseCase := usecase.NewEmployeeUseCase(employeeRepository)
 
-	manager, err := employeeUseCase.FindManagerById("34258ecc-b35c-4da9-8574-c452475af11f")
+	// manager, err := employeeUseCase.FindManagerById("34258ecc-b35c-4da9-8574-c452475af11f")
 
-	// cretae
-	bod, _ := time.Parse("2006-01-02", "1990-11-11")
-	newEmployee := entity.Employee{
-		FirstName:   "Tikas",
-		LastName:    "Yesis",
-		PhoneNumber: "08214444442",
-		Email:       "tika.yesis@gmail.com",
-		Bod:         bod,
-		Posisition:  "Software Developer",
-		Salary:      15000000,
-		Manager:     &manager,
-	}
-	newEmployee.SetId()
-	if err := employeeUseCase.RegisterNewEmployee(newEmployee); err != nil {
+	// // cretae
+	// bod, _ := time.Parse("2006-01-02", "1990-11-11")
+	// newEmployee := entity.Employee{
+	// 	FirstName:   "Tikas",
+	// 	LastName:    "Yesis",
+	// 	PhoneNumber: "08214444442",
+	// 	Email:       "tika.yesis@gmail.com",
+	// 	Bod:         bod,
+	// 	Position:    sql.NullString{String: "Software Developer"},
+	// 	Salary:      sql.NullInt64{Int64: 15000000},
+	// 	Manager:     &manager,
+	// }
+	// newEmployee.SetId()
+	// if err := employeeUseCase.RegisterNewEmployee(newEmployee); err != nil {
+	// 	fmt.Println(err)
+	// 	return
+	// }
+
+	// Get All
+	// employees, err := employeeUseCase.FindAllEmployee()
+	// if err != nil {
+	// 	fmt.Println(err)
+	// } else {
+	// 	for _, e := range employees {
+	// 		fmt.Println("ID:", e.Id)
+	// 		fmt.Println("Name:", e.FirstName, e.LastName)
+	// 		fmt.Println("Phone Number:", e.PhoneNumber)
+	// 		fmt.Println("Email:", e.Email)
+	// 		fmt.Println("Birth Date:", e.Bod)
+	// 		fmt.Println("Position:", e.Position)
+	// 		fmt.Println("Salary:", e.Salary)
+	// 		fmt.Println("Manager:", e.Manager)
+	// 		fmt.Println()
+	// 	}
+	// }
+
+	// Get
+	e, err := employeeUseCase.GetEmployee("111111")
+	if err != nil {
 		fmt.Println(err)
 		return
 	}
-
-	// Get All
-	employees, err := employeeUseCase.FindAllEmployee()
-	if err != nil {
-		fmt.Println(err)
-	} else {
-		for _, e := range employees {
-			fmt.Println("ID:", e.Id)
-			fmt.Println("Name:", e.FirstName, e.LastName)
-			fmt.Println("Phone Number:", e.PhoneNumber)
-			fmt.Println("Email:", e.Email)
-			fmt.Println("Birth Date:", e.Bod)
-			fmt.Println("Position:", e.Posisition)
-			fmt.Println("Salary:", e.Salary)
-			fmt.Println("Manager:", e.Manager)
-			fmt.Println()
-		}
-	}
+	fmt.Println("ID:", e.Id)
+	fmt.Println("Name:", e.FirstName, e.LastName)
+	fmt.Println("Phone Number:", e.PhoneNumber)
+	fmt.Println("Email:", e.Email)
+	fmt.Println("Birth Date:", e.Bod)
+	fmt.Println("Position:", e.Position)
+	fmt.Println("Salary:", e.Salary)
+	fmt.Println("Manager:", e.Manager)
+	fmt.Println()
 }
 
 func TransactionCLI() {
@@ -212,33 +228,53 @@ func TransactionCLI() {
 	employeeUseCase := usecase.NewEmployeeUseCase(repository.NewEmployeeRepository(dbConn.Conn()))
 
 	transactionUseCase := usecase.NewTransactionUseCase(transactionRepo, vehicleUseCase, customerUseCase, employeeUseCase)
-	newTransaction := entity.Transaction{
-		Id:       "T0001",
-		Vehicle:  entity.Vehicle{Id: "b3a41ff7-a5af-4f04-b0e5-19e7451a8556"},
-		Customer: entity.Customer{Id: "afc49d21-a381-42f0-8f0b-d94d4148d8e1"},
-		Employee: entity.Employee{Id: "15c68c8f-eff0-42cc-a8dd-903be384fa8a"},
-		Type:     "Online",
-		Qty:      1,
-	}
+	// newTransaction := entity.Transaction{
+	// 	Id:       "T0001",
+	// 	Vehicle:  entity.Vehicle{Id: "b3a41ff7-a5af-4f04-b0e5-19e7451a8556"},
+	// 	Customer: entity.Customer{Id: "afc49d21-a381-42f0-8f0b-d94d4148d8e1"},
+	// 	Employee: entity.Employee{Id: "15c68c8f-eff0-42cc-a8dd-903be384fa8a"},
+	// 	Type:     "Online",
+	// 	Qty:      1,
+	// }
 
-	if err := transactionUseCase.RegisterNewTransaction(newTransaction); err != nil {
+	// if err := transactionUseCase.RegisterNewTransaction(newTransaction); err != nil {
+	// 	fmt.Println(err)
+	// 	return
+	// }
+
+	// FindAllTransaction
+	transactions, err := transactionUseCase.FindAllTransaction()
+	if err != nil {
 		fmt.Println(err)
-		return
+	} else {
+		for _, t := range transactions {
+			fmt.Println("ID:", t.Id)
+			fmt.Println("Date:", t.TransactionDate)
+			fmt.Println("Customer:", t.CustomerName)
+			fmt.Println("Vehicle:", t.VehicleBrand, t.VehicleModel)
+			fmt.Println("Employee:", t.EmployeeName)
+			fmt.Println("Type:", t.Type)
+			fmt.Println("Payment Amount:", t.PaymentAmount)
+			fmt.Println("Qty:", t.Qty)
+			fmt.Println()
+		}
 	}
 
-	// Get All
-	// transactions, err := transactionUseCase.FindAllTransaction()
+	// FindAllTransaction
+	// transactions, err := transactionUseCase.GetAll()
 	// if err != nil {
 	// 	fmt.Println(err)
 	// } else {
 	// 	for _, t := range transactions {
 	// 		fmt.Println("ID:", t.Id)
 	// 		fmt.Println("Date:", t.TransactionDate)
-	// 		fmt.Println("Vehicle:", t.Vehicle.Brand, t.Vehicle.Model)
-	// 		fmt.Println("Customer:", t.Customer.FirstName, t.Customer.LastName)
-	// 		fmt.Println("Employee:", t.Employee.FirstName, t.Employee.LastName)
+	// 		fmt.Println("Customer:", t.Customer)
+	// 		fmt.Println("Vehicle:", t.Vehicle)
+	// 		fmt.Println("Employee:", t.Employee)
+	// 		fmt.Println("Employee Manager:", t.Employee.Manager)
 	// 		fmt.Println("Type:", t.Type)
 	// 		fmt.Println("Payment Amount:", t.PaymentAmount)
+	// 		fmt.Println("Qty:", t.Qty)
 	// 		fmt.Println()
 	// 	}
 	// }

@@ -5,13 +5,14 @@ import "time"
 type TransactionResponseDto struct {
 	Id              string
 	TransactionDate time.Time
+	CustomerId      string
+	CustomerName    string
 	VehicleId       string
 	VehicleBrand    string
 	VehicleModel    string
-	CustomerId      string
-	CustomerName    string
 	EmployeeId      string
 	EmployeeName    string
+	Qty             int
 	Type            string
 	PaymentAmount   int
 }

@@ -1,24 +1,24 @@
 package entity
 
 import (
-	"time"
+	"database/sql"
 
 	"github.com/google/uuid"
 )
 
 type Employee struct {
-	Id          string
-	FirstName   string
-	LastName    string
-	Address     string
-	PhoneNumber string
-	Email       string
-	Bod         time.Time
-	Posisition  string
-	Salary      int
+	Id          sql.NullString
+	FirstName   sql.NullString
+	LastName    sql.NullString
+	Address     sql.NullString
+	PhoneNumber sql.NullString
+	Email       sql.NullString
+	Bod         sql.NullTime
+	Position    sql.NullString
+	Salary      sql.NullInt64
 	Manager     *Employee
 }
 
 func (e *Employee) SetId() {
-	e.Id = uuid.New().String()
+	e.Id = sql.NullString{String: uuid.New().String()}
 }

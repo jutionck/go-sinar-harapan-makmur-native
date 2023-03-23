@@ -4,14 +4,16 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/jutionck/golang-db-sinar-harapan-makmur/model/dto"
 	"github.com/jutionck/golang-db-sinar-harapan-makmur/model/entity"
 	"github.com/jutionck/golang-db-sinar-harapan-makmur/repository"
 )
 
 type TransactionUseCase interface {
 	RegisterNewTransaction(newData entity.Transaction) error
-	FindAllTransaction() ([]entity.Transaction, error)
+	FindAllTransaction() ([]dto.TransactionResponseDto, error)
 	FindTransactionById(id string) (entity.Transaction, error)
+	GetAll() ([]entity.Transaction, error)
 }
 
 type transactionUsecase struct {
@@ -39,9 +41,9 @@ func (t *transactionUsecase) RegisterNewTransaction(newData entity.Transaction) 
 	}
 
 	// get employee
-	employee, err := t.employeeUseCase.GetEmployee(newData.Employee.Id)
+	employee, err := t.employeeUseCase.GetEmployee(newData.Employee.Id.String)
 	if err != nil {
-		return fmt.Errorf("Employee with ID: %s not exists", newData.Employee.Id)
+		return fmt.Errorf("Employee with ID: %s not exists", newData.Employee.Id.String)
 	}
 
 	newData.Vehicle = vehicle
@@ -58,9 +60,15 @@ func (t *transactionUsecase) RegisterNewTransaction(newData entity.Transaction) 
 
 	return t.transactionRepo.Create(newData)
 }
-func (t *transactionUsecase) FindAllTransaction() ([]entity.Transaction, error) {
+
+func (t *transactionUsecase) FindAllTransaction() ([]dto.TransactionResponseDto, error) {
 	return t.transactionRepo.List()
 }
+
+func (t *transactionUsecase) GetAll() ([]entity.Transaction, error) {
+	return t.transactionRepo.GetAll()
+}
+
 func (t *transactionUsecase) FindTransactionById(id string) (entity.Transaction, error) {
 	return t.transactionRepo.Get(id)
 }
