@@ -3,26 +3,26 @@ package usecase
 import (
 	"fmt"
 
-	"github.com/jutionck/golang-db-sinar-harapan-makmur/model"
+	"github.com/jutionck/golang-db-sinar-harapan-makmur/model/entity"
 	"github.com/jutionck/golang-db-sinar-harapan-makmur/repository"
 )
 
 type EmployeeUseCase interface {
-	RegisterNewEmployee(newEmployee model.Employee) error
-	FindAllEmployee() ([]model.Employee, error)
-	GetEmployee(id string) (model.Employee, error)
-	UpdateEmployee(newEmployee model.Employee) error
+	RegisterNewEmployee(newEmployee entity.Employee) error
+	FindAllEmployee() ([]entity.Employee, error)
+	GetEmployee(id string) (entity.Employee, error)
+	UpdateEmployee(newEmployee entity.Employee) error
 	DeleteEmployee(id string) error
-	FindEmployeeByEmail(email string) (model.Employee, error)
-	FindEmployeeByPhoneNumber(phoneNumber string) (model.Employee, error)
-	FindManagerById(id string) (model.Employee, error)
+	FindEmployeeByEmail(email string) (entity.Employee, error)
+	FindEmployeeByPhoneNumber(phoneNumber string) (entity.Employee, error)
+	FindManagerById(id string) (entity.Employee, error)
 }
 
 type employeeUseCase struct {
 	employeeRepo repository.EmployeeRepository
 }
 
-func (e *employeeUseCase) RegisterNewEmployee(newEmployee model.Employee) error {
+func (e *employeeUseCase) RegisterNewEmployee(newEmployee entity.Employee) error {
 	isExists, _ := e.GetEmployee(newEmployee.Id)
 	if isExists.Id == newEmployee.Id {
 		return fmt.Errorf("Employee with ID: %v exists", newEmployee.Id)
@@ -60,15 +60,15 @@ func (e *employeeUseCase) RegisterNewEmployee(newEmployee model.Employee) error 
 	return nil
 }
 
-func (e *employeeUseCase) FindAllEmployee() ([]model.Employee, error) {
+func (e *employeeUseCase) FindAllEmployee() ([]entity.Employee, error) {
 	return e.employeeRepo.List()
 }
 
-func (e *employeeUseCase) GetEmployee(id string) (model.Employee, error) {
+func (e *employeeUseCase) GetEmployee(id string) (entity.Employee, error) {
 	return e.employeeRepo.Get(id)
 }
 
-func (e *employeeUseCase) UpdateEmployee(newEmployee model.Employee) error {
+func (e *employeeUseCase) UpdateEmployee(newEmployee entity.Employee) error {
 	isEmailExist, _ := e.employeeRepo.GetByEmail(newEmployee.Email)
 
 	if isEmailExist.Email == newEmployee.Email && isEmailExist.Id != newEmployee.Id {
@@ -106,15 +106,15 @@ func (e *employeeUseCase) DeleteEmployee(id string) error {
 	return e.employeeRepo.Delete(id)
 }
 
-func (e *employeeUseCase) FindEmployeeByEmail(email string) (model.Employee, error) {
+func (e *employeeUseCase) FindEmployeeByEmail(email string) (entity.Employee, error) {
 	return e.employeeRepo.GetByEmail(email)
 }
 
-func (e *employeeUseCase) FindEmployeeByPhoneNumber(phoneNumber string) (model.Employee, error) {
+func (e *employeeUseCase) FindEmployeeByPhoneNumber(phoneNumber string) (entity.Employee, error) {
 	return e.employeeRepo.GetByPhoneNumber(phoneNumber)
 }
 
-func (e *employeeUseCase) FindManagerById(id string) (model.Employee, error) {
+func (e *employeeUseCase) FindManagerById(id string) (entity.Employee, error) {
 	return e.GetEmployee(id)
 }
 

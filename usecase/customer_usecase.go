@@ -3,25 +3,25 @@ package usecase
 import (
 	"fmt"
 
-	"github.com/jutionck/golang-db-sinar-harapan-makmur/model"
+	"github.com/jutionck/golang-db-sinar-harapan-makmur/model/entity"
 	"github.com/jutionck/golang-db-sinar-harapan-makmur/repository"
 )
 
 type CustomerUseCase interface {
-	RegisterNewCustomer(newCustomer model.Customer) error
-	FindAllCustomer() ([]model.Customer, error)
-	GetCustomer(id string) (model.Customer, error)
-	UpdateCustomer(newCustomer model.Customer) error
+	RegisterNewCustomer(newCustomer entity.Customer) error
+	FindAllCustomer() ([]entity.Customer, error)
+	GetCustomer(id string) (entity.Customer, error)
+	UpdateCustomer(newCustomer entity.Customer) error
 	DeleteCustomer(id string) error
-	FindCustomerByEmail(email string) (model.Customer, error)
-	FindCustomerByPhoneNumber(phoneNumber string) (model.Customer, error)
+	FindCustomerByEmail(email string) (entity.Customer, error)
+	FindCustomerByPhoneNumber(phoneNumber string) (entity.Customer, error)
 }
 
 type customerUseCase struct {
 	customerRepo repository.CustomerRepository
 }
 
-func (c *customerUseCase) RegisterNewCustomer(newCustomer model.Customer) error {
+func (c *customerUseCase) RegisterNewCustomer(newCustomer entity.Customer) error {
 	isExists, _ := c.GetCustomer(newCustomer.Id)
 	if isExists.Id == newCustomer.Id {
 		return fmt.Errorf("Customer with ID: %v exists", newCustomer.Id)
@@ -49,15 +49,15 @@ func (c *customerUseCase) RegisterNewCustomer(newCustomer model.Customer) error 
 	return nil
 }
 
-func (c *customerUseCase) FindAllCustomer() ([]model.Customer, error) {
+func (c *customerUseCase) FindAllCustomer() ([]entity.Customer, error) {
 	return c.customerRepo.List()
 }
 
-func (c *customerUseCase) GetCustomer(id string) (model.Customer, error) {
+func (c *customerUseCase) GetCustomer(id string) (entity.Customer, error) {
 	return c.customerRepo.Get(id)
 }
 
-func (c *customerUseCase) UpdateCustomer(newCustomer model.Customer) error {
+func (c *customerUseCase) UpdateCustomer(newCustomer entity.Customer) error {
 	isEmailExist, _ := c.customerRepo.GetByEmail(newCustomer.Email)
 
 	if isEmailExist.Email == newCustomer.Email && isEmailExist.Id != newCustomer.Id {
@@ -85,10 +85,10 @@ func (c *customerUseCase) DeleteCustomer(id string) error {
 	return c.customerRepo.Delete(id)
 }
 
-func (c *customerUseCase) FindCustomerByEmail(email string) (model.Customer, error) {
+func (c *customerUseCase) FindCustomerByEmail(email string) (entity.Customer, error) {
 	return c.customerRepo.GetByEmail(email)
 }
-func (c *customerUseCase) FindCustomerByPhoneNumber(phoneNumber string) (model.Customer, error) {
+func (c *customerUseCase) FindCustomerByPhoneNumber(phoneNumber string) (entity.Customer, error) {
 	return c.customerRepo.GetByPhoneNumber(phoneNumber)
 }
 

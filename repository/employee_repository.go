@@ -3,20 +3,20 @@ package repository
 import (
 	"database/sql"
 
-	"github.com/jutionck/golang-db-sinar-harapan-makmur/model"
+	"github.com/jutionck/golang-db-sinar-harapan-makmur/model/entity"
 )
 
 type EmployeeRepository interface {
-	BaseRepository[model.Employee]
-	GetByEmail(email string) (model.Employee, error)
-	GetByPhoneNumber(phoneNumber string) (model.Employee, error)
+	BaseRepository[entity.Employee]
+	GetByEmail(email string) (entity.Employee, error)
+	GetByPhoneNumber(phoneNumber string) (entity.Employee, error)
 }
 
 type employeeRepository struct {
 	db *sql.DB
 }
 
-func (e *employeeRepository) Create(newData model.Employee) error {
+func (e *employeeRepository) Create(newData entity.Employee) error {
 	sql := "INSERT INTO employee (id, first_name, last_name, address, phone_number, email, bod, position, salary, manager_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)"
 
 	var managerID interface{}
@@ -33,7 +33,7 @@ func (e *employeeRepository) Create(newData model.Employee) error {
 	return nil
 }
 
-func (e *employeeRepository) List() ([]model.Employee, error) {
+func (e *employeeRepository) List() ([]entity.Employee, error) {
 	// sementara (manager_id di hilangkan)
 	// harusnya join ini untuk mendapatkan managerID
 	sql := `SELECT id, first_name, last_name, address, phone_number, email, bod, position, salary FROM employee`
@@ -42,9 +42,9 @@ func (e *employeeRepository) List() ([]model.Employee, error) {
 		return nil, err
 	}
 
-	var employees []model.Employee
+	var employees []entity.Employee
 	for rows.Next() {
-		var employee model.Employee
+		var employee entity.Employee
 		err := rows.Scan(&employee.Id, &employee.FirstName, &employee.LastName, &employee.Address, &employee.PhoneNumber, &employee.Email, &employee.Bod, &employee.Posisition, &employee.Salary)
 		if err != nil {
 			return nil, err
@@ -54,19 +54,19 @@ func (e *employeeRepository) List() ([]model.Employee, error) {
 	return employees, nil
 }
 
-func (e *employeeRepository) Get(id string) (model.Employee, error) {
+func (e *employeeRepository) Get(id string) (entity.Employee, error) {
 	// sementara (manager_id di hilangkan)
 	// harusnya join ini untuk mendapatkan managerID
 	sql := `SELECT id, first_name, last_name, address, phone_number, email, bod, position, salary FROM employee WHERE id = $1`
-	var employee model.Employee
+	var employee entity.Employee
 	err := e.db.QueryRow(sql, id).Scan(&employee.Id, &employee.FirstName, &employee.LastName, &employee.Address, &employee.PhoneNumber, &employee.Email, &employee.Bod, &employee.Posisition, &employee.Salary)
 	if err != nil {
-		return model.Employee{}, err
+		return entity.Employee{}, err
 	}
 	return employee, nil
 }
 
-func (e *employeeRepository) Update(newData model.Employee) error {
+func (e *employeeRepository) Update(newData entity.Employee) error {
 	sql := "UPDATE employee SET first_name = $1, last_name = $2, address = $3, phone_number = $4, email = $5, bod = $6, position = $7, salary = $8, manager_id = $9 WHERE id = $10"
 	var managerID interface{}
 	if newData.Manager != nil {
@@ -92,22 +92,22 @@ func (e *employeeRepository) Delete(id string) error {
 	return nil
 }
 
-func (e *employeeRepository) GetByEmail(email string) (model.Employee, error) {
+func (e *employeeRepository) GetByEmail(email string) (entity.Employee, error) {
 	sql := `SELECT id, email FROM employee WHERE email = $1`
-	var employee model.Employee
+	var employee entity.Employee
 	err := e.db.QueryRow(sql, email).Scan(&employee.Id, &employee.Email)
 	if err != nil {
-		return model.Employee{}, err
+		return entity.Employee{}, err
 	}
 	return employee, nil
 }
 
-func (e *employeeRepository) GetByPhoneNumber(phoneNumber string) (model.Employee, error) {
+func (e *employeeRepository) GetByPhoneNumber(phoneNumber string) (entity.Employee, error) {
 	sql := `SELECT id, phone_number FROM employee WHERE phone_number = $1`
-	var employee model.Employee
+	var employee entity.Employee
 	err := e.db.QueryRow(sql, phoneNumber).Scan(&employee.Id, &employee.PhoneNumber)
 	if err != nil {
-		return model.Employee{}, err
+		return entity.Employee{}, err
 	}
 	return employee, nil
 }

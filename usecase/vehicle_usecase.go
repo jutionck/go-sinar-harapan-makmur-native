@@ -3,25 +3,25 @@ package usecase
 import (
 	"fmt"
 
-	"github.com/jutionck/golang-db-sinar-harapan-makmur/model"
 	"github.com/jutionck/golang-db-sinar-harapan-makmur/model/dto"
+	"github.com/jutionck/golang-db-sinar-harapan-makmur/model/entity"
 	"github.com/jutionck/golang-db-sinar-harapan-makmur/repository"
 )
 
 type VehicleUseCase interface {
-	RegisterNewVehicle(newVehicle model.Vehicle) error
-	FindAllVehicle() ([]model.Vehicle, error)
-	GetVehicle(id string) (model.Vehicle, error)
-	UpdateVehicle(newVehicle model.Vehicle) error
+	RegisterNewVehicle(newVehicle entity.Vehicle) error
+	FindAllVehicle() ([]entity.Vehicle, error)
+	GetVehicle(id string) (entity.Vehicle, error)
+	UpdateVehicle(newVehicle entity.Vehicle) error
 	DeleteVehicle(id string) error
-	Paging(requestQueryParams dto.RequestQueryParams) ([]model.Vehicle, dto.Paging, error)
+	Paging(requestQueryParams dto.RequestQueryParams) ([]entity.Vehicle, dto.Paging, error)
 }
 
 type vehicleUseCase struct {
 	vehicleRepo repository.VehicleRepository
 }
 
-func (v *vehicleUseCase) RegisterNewVehicle(newVehicle model.Vehicle) error {
+func (v *vehicleUseCase) RegisterNewVehicle(newVehicle entity.Vehicle) error {
 
 	if err := vehicleValidation(newVehicle); err != nil {
 		return err
@@ -35,15 +35,15 @@ func (v *vehicleUseCase) RegisterNewVehicle(newVehicle model.Vehicle) error {
 	return nil
 }
 
-func (v *vehicleUseCase) FindAllVehicle() ([]model.Vehicle, error) {
+func (v *vehicleUseCase) FindAllVehicle() ([]entity.Vehicle, error) {
 	return v.vehicleRepo.List()
 }
 
-func (v *vehicleUseCase) GetVehicle(id string) (model.Vehicle, error) {
+func (v *vehicleUseCase) GetVehicle(id string) (entity.Vehicle, error) {
 	return v.vehicleRepo.Get(id)
 }
 
-func (v *vehicleUseCase) UpdateVehicle(newVehicle model.Vehicle) error {
+func (v *vehicleUseCase) UpdateVehicle(newVehicle entity.Vehicle) error {
 	if err := vehicleValidation(newVehicle); err != nil {
 		return err
 	}
@@ -60,14 +60,14 @@ func (v *vehicleUseCase) DeleteVehicle(id string) error {
 	return v.vehicleRepo.Delete(id)
 }
 
-func (v *vehicleUseCase) Paging(requestQueryParams dto.RequestQueryParams) ([]model.Vehicle, dto.Paging, error) {
+func (v *vehicleUseCase) Paging(requestQueryParams dto.RequestQueryParams) ([]entity.Vehicle, dto.Paging, error) {
 	if !requestQueryParams.QueryParams.IsSortValid() {
 		return nil, dto.Paging{}, fmt.Errorf("Invalid sort by: %s", requestQueryParams.QueryParams.Sort)
 	}
 	return v.vehicleRepo.Paging(requestQueryParams)
 }
 
-func vehicleValidation(payload model.Vehicle) error {
+func vehicleValidation(payload entity.Vehicle) error {
 	if payload.Brand == "" || payload.Model == "" || payload.Color == "" {
 		return fmt.Errorf("Brand, Model, and Color are required fields")
 	}

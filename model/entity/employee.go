@@ -1,4 +1,4 @@
-package model
+package entity
 
 import (
 	"time"
@@ -6,7 +6,7 @@ import (
 	"github.com/google/uuid"
 )
 
-type Customer struct {
+type Employee struct {
 	Id          string
 	FirstName   string
 	LastName    string
@@ -14,8 +14,11 @@ type Customer struct {
 	PhoneNumber string
 	Email       string
 	Bod         time.Time
+	Posisition  string
+	Salary      int
+	Manager     *Employee
 }
 
-func (c *Customer) SetId() {
-	c.Id = uuid.New().String()
+func (e *Employee) SetId() {
+	e.Id = uuid.New().String()
 }

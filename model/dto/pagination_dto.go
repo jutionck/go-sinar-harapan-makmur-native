@@ -7,7 +7,7 @@ type QueryParams struct {
 }
 
 func (qp *QueryParams) IsSortValid() bool {
-	return qp.Sort == "ASC" || qp.Sort == "DESC"
+	return qp.Sort == "asc" || qp.Sort == "desc"
 }
 
 type PaginationParam struct {

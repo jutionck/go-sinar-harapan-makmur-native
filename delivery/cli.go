@@ -5,8 +5,8 @@ import (
 	"time"
 
 	"github.com/jutionck/golang-db-sinar-harapan-makmur/config"
-	"github.com/jutionck/golang-db-sinar-harapan-makmur/model"
 	"github.com/jutionck/golang-db-sinar-harapan-makmur/model/dto"
+	"github.com/jutionck/golang-db-sinar-harapan-makmur/model/entity"
 	"github.com/jutionck/golang-db-sinar-harapan-makmur/repository"
 	"github.com/jutionck/golang-db-sinar-harapan-makmur/usecase"
 )
@@ -24,7 +24,7 @@ func VehicleCLI() {
 	vehicleUseCase := usecase.NewVehicleUseCase(vehicleRepository)
 
 	// cretae
-	// newVehicle := model.Vehicle{
+	// newVehicle := entity.Vehicle{
 	// 	Brand:     "Toyota",
 	// 	Model:     "Alphard",
 	// 	Color:     "Putih",
@@ -107,7 +107,7 @@ func CustomerCLI() {
 
 	// cretae
 	bod, _ := time.Parse("2006-01-02", "1999-11-11")
-	newCustomer := model.Customer{
+	newCustomer := entity.Customer{
 		FirstName:   "Tika",
 		LastName:    "Yesi",
 		PhoneNumber: "0821444444",
@@ -150,7 +150,7 @@ func EmployeeCLI() {
 
 	// cretae
 	bod, _ := time.Parse("2006-01-02", "1990-11-11")
-	newEmployee := model.Employee{
+	newEmployee := entity.Employee{
 		FirstName:   "Tika",
 		LastName:    "Yesi",
 		PhoneNumber: "0821444444",
@@ -158,7 +158,7 @@ func EmployeeCLI() {
 		Bod:         bod,
 		Posisition:  "Software Developer",
 		Salary:      15000000,
-		Manager:     &model.Employee{Id: "34258ecc-b35c-4da9-8574-c452475af11f"},
+		Manager:     &entity.Employee{Id: "34258ecc-b35c-4da9-8574-c452475af11f"},
 	}
 	newEmployee.SetId()
 	if err := employeeUseCase.RegisterNewEmployee(newEmployee); err != nil {
@@ -200,11 +200,11 @@ func TransactionCLI() {
 	employeeUseCase := usecase.NewEmployeeUseCase(repository.NewEmployeeRepository(dbConn.Conn()))
 
 	transactionUseCase := usecase.NewTransactionUseCase(transactionRepo, vehicleUseCase, customerUseCase, employeeUseCase)
-	// newTransaction := model.Transaction{
+	// newTransaction := entity.Transaction{
 	// 	Id:       "T0001",
-	// 	Vehicle:  model.Vehicle{Id: "b3a41ff7-a5af-4f04-b0e5-19e7451a8556"},
-	// 	Customer: model.Customer{Id: "afc49d21-a381-42f0-8f0b-d94d4148d8e1"},
-	// 	Employee: model.Employee{Id: "15c68c8f-eff0-42cc-a8dd-903be384fa8a"},
+	// 	Vehicle:  entity.Vehicle{Id: "b3a41ff7-a5af-4f04-b0e5-19e7451a8556"},
+	// 	Customer: entity.Customer{Id: "afc49d21-a381-42f0-8f0b-d94d4148d8e1"},
+	// 	Employee: entity.Employee{Id: "15c68c8f-eff0-42cc-a8dd-903be384fa8a"},
 	// 	Type:     "Online",
 	// }
 
