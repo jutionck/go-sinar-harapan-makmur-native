@@ -28,6 +28,10 @@ func (t *transactionUsecase) RegisterNewTransaction(newData entity.Transaction) 
 		return fmt.Errorf("Vehicle with ID: %s not exists", newData.Vehicle.Id)
 	}
 
+	if vehicle.Stock < newData.Qty {
+		return fmt.Errorf("Stock of vehicle is not enough")
+	}
+
 	// get customer
 	customer, err := t.customerUseCase.GetCustomer(newData.Customer.Id)
 	if err != nil {
